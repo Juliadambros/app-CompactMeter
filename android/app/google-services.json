@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "132422513872",
+    "project_id": "compactmeter-1ec77",
+    "storage_bucket": "compactmeter-1ec77.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:132422513872:android:f087c686b9c0f5f2419ad5",
+        "android_client_info": {
+          "package_name": "com.example.app_compactmeter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRE3FS5tmVahGpCyv8kYiPt813JPhNFpQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
