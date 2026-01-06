@@ -1,3 +1,6 @@
+import 'package:app_compactmeter/view/usuario/historico/historico_page.dart';
+import 'package:app_compactmeter/view/usuario/medicoes/nova_medicao_page.dart';
+import 'package:app_compactmeter/view/usuario/veiculos/lista_veiculos_page.dart';
 import 'package:flutter/material.dart';
 import '../../service/auth_service.dart';
 import '../../theme/app_colors.dart';
@@ -46,20 +49,38 @@ class HomeUsuario extends StatelessWidget {
 
             _CardFuncionalidade(
               icon: Icons.agriculture,
-              titulo: 'Dados do Trator',
-              descricao: 'Visualizar medições do sensor',
+              titulo: 'Dados dos veículos',
+              descricao: 'Visualizar/Cadastrar veículos',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ListaVeiculosPage()),
+                );
+              },
             ),
 
             _CardFuncionalidade(
               icon: Icons.calculate,
-              titulo: 'Cálculos',
-              descricao: 'Solicitar cálculos',
+              titulo: 'Medições',
+              descricao: 'Solicitar medições',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const NovaMedicaoPage()),
+                );
+              },
             ),
 
             _CardFuncionalidade(
               icon: Icons.history,
               titulo: 'Histórico',
               descricao: 'Ver registros anteriores',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const HistoricoPage()),
+                );
+              },
             ),
           ],
         ),
@@ -72,39 +93,28 @@ class _CardFuncionalidade extends StatelessWidget {
   final IconData icon;
   final String titulo;
   final String descricao;
+  final VoidCallback onTap;
 
   const _CardFuncionalidade({
     required this.icon,
     required this.titulo,
     required this.descricao,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 3,
       child: ListTile(
-        leading: Icon(
-          icon,
-          size: 32,
-          color: AppColors.verde,
-        ),
+        leading: Icon(icon, size: 32, color: AppColors.verde),
         title: Text(titulo),
         subtitle: Text(descricao),
-        trailing: const Icon(
-          Icons.arrow_forward_ios,
-          size: 16,
-        ),
-        onTap: () {
-          // navegação futura
-        },
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        onTap: onTap,
       ),
     );
   }
 }
-
-

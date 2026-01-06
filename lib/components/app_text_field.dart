@@ -5,6 +5,7 @@ class AppTextField extends StatelessWidget {
   final String label;
   final bool obscure;
   final TextInputType keyboardType;
+  final int maxLines;
 
   const AppTextField({
     super.key,
@@ -12,6 +13,7 @@ class AppTextField extends StatelessWidget {
     required this.label,
     this.obscure = false,
     this.keyboardType = TextInputType.text,
+    this.maxLines = 1,
   });
 
   @override
@@ -20,6 +22,7 @@ class AppTextField extends StatelessWidget {
       controller: controller,
       obscureText: obscure,
       keyboardType: keyboardType,
+      maxLines: maxLines,
       decoration: InputDecoration(
         labelText: label,
         border: OutlineInputBorder(
