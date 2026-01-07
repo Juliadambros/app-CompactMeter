@@ -59,13 +59,6 @@ class HomeAdmin extends StatelessWidget {
                     );
                   },
                 ),
-                ActionCard(
-                  icon: Icons.inventory,
-                  titulo: 'Gerenciar Produtos',
-                  onTap: () {
-                    // Futuro
-                  },
-                ),
               ],
             ),
           ],

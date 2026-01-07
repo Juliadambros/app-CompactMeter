@@ -80,57 +80,80 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       backgroundColor: AppColors.fundo,
       body: Center(
-        child: Card(
-          elevation: 6,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const AppHeader(
-                  titulo: 'CompactMeter',
-                  subtitulo: 'Acesse sua conta',
-                ),
-                const SizedBox(height: 24),
-
-                AppTextField(
-                  controller: emailCtrl,
-                  label: 'Email',
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                const SizedBox(height: 12),
-
-                AppTextField(
-                  controller: senhaCtrl,
-                  label: 'Senha',
-                  obscure: true,
-                ),
-                const SizedBox(height: 20),
-
-                AppButton(texto: 'Entrar', loading: loading, onPressed: login),
-
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/cadastro');
-                  },
-                  child: const Text('Criar conta'),
-                ),
-
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const RecuperarSenhaPage(),
-                      ),
-                    );
-                  },
-                  child: const Text('Esqueceu a senha?'),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 420),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.12),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
                 ),
               ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const AppHeader(
+                    titulo: 'CompactMeter',
+                    subtitulo: 'Acesse sua conta',
+                  ),
+                  const SizedBox(height: 24),
+
+                  AppTextField(
+                    controller: emailCtrl,
+                    label: 'Email',
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  const SizedBox(height: 16),
+
+                  AppTextField(
+                    controller: senhaCtrl,
+                    label: 'Senha',
+                    obscure: true,
+                  ),
+                  const SizedBox(height: 24),
+
+                  AppButton(
+                    texto: 'Entrar',
+                    loading: loading,
+                    onPressed: login,
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/cadastro');
+                    },
+                    child: Text(
+                      'Criar conta',
+                      style: TextStyle(color: AppColors.azul),
+                    ),
+                  ),
+
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const RecuperarSenhaPage(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      'Esqueceu a senha?',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
