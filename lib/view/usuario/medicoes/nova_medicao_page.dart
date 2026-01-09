@@ -36,8 +36,7 @@ class _NovaMedicaoPageState extends State<NovaMedicaoPage> {
 
   Future<void> _carregarVeiculos() async {
     final uid = FirebaseAuth.instance.currentUser!.uid;
-    final lista =
-        await VeiculoService().listarVeiculosPorUsuario(uid);
+    final lista = await VeiculoService().listarVeiculosPorUsuario(uid);
 
     setState(() {
       _veiculos = lista;
@@ -49,13 +48,13 @@ class _NovaMedicaoPageState extends State<NovaMedicaoPage> {
     if (_nomeController.text.isEmpty ||
         _propriedadeController.text.isEmpty ||
         _veiculoSelecionado == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Preencha todos os campos')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Preencha todos os campos')));
       return;
     }
 
-    final usuario = FirebaseAuth.instance.currentUser!;
+    final uid = FirebaseAuth.instance.currentUser!.uid;
     final random = Random();
 
     final distanciaReal = 100 + random.nextDouble() * 50;
@@ -76,7 +75,7 @@ class _NovaMedicaoPageState extends State<NovaMedicaoPage> {
       rotacoes: rotacoes,
       patinagem: patinagem,
       data: DateTime.now(),
-      usuarioId: usuario.uid,
+      usuarioId: uid,
     );
 
     await MedicaoService().salvarMedicao(medicao);
@@ -85,9 +84,7 @@ class _NovaMedicaoPageState extends State<NovaMedicaoPage> {
 
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => ResultadoMedicaoPage(medicao: medicao),
-      ),
+      MaterialPageRoute(builder: (_) => ResultadoMedicaoPage(medicao: medicao)),
     );
   }
 
@@ -122,10 +119,8 @@ class _NovaMedicaoPageState extends State<NovaMedicaoPage> {
                     ),
                     items: _veiculos
                         .map(
-                          (v) => DropdownMenuItem(
-                            value: v,
-                            child: Text(v.nome),
-                          ),
+                          (v) =>
+                              DropdownMenuItem(value: v, child: Text(v.nome)),
                         )
                         .toList(),
                     onChanged: (v) {
@@ -143,4 +138,3 @@ class _NovaMedicaoPageState extends State<NovaMedicaoPage> {
     );
   }
 }
-

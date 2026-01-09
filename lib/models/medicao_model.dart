@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class MedicaoModel {
   final String id;
   final String nome;
@@ -7,7 +9,7 @@ class MedicaoModel {
   final int rotacoes;
   final double patinagem;
   final DateTime data;
-  final String usuarioId; 
+  final String usuarioId;
 
   MedicaoModel({
     required this.id,
@@ -22,26 +24,40 @@ class MedicaoModel {
   });
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'nome': nome,
-        'propriedade': propriedade,
-        'veiculoId': veiculoId,
-        'distanciaReal': distanciaReal,
-        'rotacoes': rotacoes,
-        'patinagem': patinagem,
-        'data': data.toIso8601String(),
-        'usuarioId': usuarioId,
-      };
+    'id': id,
+    'nome': nome,
+    'propriedade': propriedade,
+    'veiculoId': veiculoId,
+    'distanciaReal': distanciaReal,
+    'rotacoes': rotacoes,
+    'patinagem': patinagem,
+    'data': Timestamp.fromDate(data),
+    'usuarioId': usuarioId,
+  };
 
-  factory MedicaoModel.fromMap(Map<String, dynamic> map) => MedicaoModel(
-        id: map['id'],
-        nome: map['nome'],
-        propriedade: map['propriedade'],
-        veiculoId: map['veiculoId'],
-        distanciaReal: (map['distanciaReal'] as num).toDouble(),
-        rotacoes: map['rotacoes'],
-        patinagem: (map['patinagem'] as num).toDouble(),
-        data: DateTime.parse(map['data']),
-        usuarioId: map['usuarioId'],
-      );
+  factory MedicaoModel.fromMap(Map<String, dynamic> map) {
+    DateTime dataConvertida;
+
+    final rawData = map['data'];
+
+    if (rawData is Timestamp) {
+      dataConvertida = rawData.toDate();
+    } else if (rawData is String) {
+      dataConvertida = DateTime.parse(rawData);
+    } else {
+      dataConvertida = DateTime.now(); // fallback
+    }
+
+    return MedicaoModel(
+      id: map['id'],
+      nome: map['nome'],
+      propriedade: map['propriedade'],
+      veiculoId: map['veiculoId'],
+      distanciaReal: (map['distanciaReal'] as num).toDouble(),
+      rotacoes: (map['rotacoes'] as num).toInt(),
+      patinagem: (map['patinagem'] as num).toDouble(),
+      data: dataConvertida,
+      usuarioId: map['usuarioId'],
+    );
+  }
 }

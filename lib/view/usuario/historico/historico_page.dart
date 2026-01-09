@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 
 import '../../../models/medicao_model.dart';
 import '../../../service/medicao_service.dart';
@@ -23,6 +24,12 @@ class _HistoricoPageState extends State<HistoricoPage> {
     _carregarHistorico();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _carregarHistorico();
+  }
+
   void _carregarHistorico() {
     final uid = FirebaseAuth.instance.currentUser!.uid;
     _futureMedicoes = MedicaoService().listarPorUsuario(uid);
@@ -43,19 +50,28 @@ class _HistoricoPageState extends State<HistoricoPage> {
             return const AppLoading();
           }
 
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text('Nenhuma medição encontrada'),
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                'Erro ao carregar histórico:\n${snapshot.error}',
+                textAlign: TextAlign.center,
+              ),
             );
           }
 
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('Nenhuma medição encontrada'));
+          }
+
           final medicoes = snapshot.data!;
+          final formatter = DateFormat('dd/MM/yyyy HH:mm');
 
           return ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: medicoes.length,
             itemBuilder: (context, index) {
               final medicao = medicoes[index];
+              final dataFormatada = formatter.format(medicao.data);
 
               return Card(
                 margin: const EdgeInsets.only(bottom: 12),
@@ -64,24 +80,31 @@ class _HistoricoPageState extends State<HistoricoPage> {
                 ),
                 elevation: 3,
                 child: ListTile(
-                  leading: Icon(
-                    Icons.calculate,
-                    color: AppColors.verde,
+                  leading: Icon(Icons.calculate, color: AppColors.verde),
+                  title: Text(
+                    medicao.nome,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  title: Text(medicao.nome),
-                  subtitle: Text(
-                    'Patinagem: ${medicao.patinagem.toStringAsFixed(2)}%',
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 4),
+                      Text(
+                        'Patinagem: ${medicao.patinagem.toStringAsFixed(2)}%',
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Data: $dataFormatada',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ],
                   ),
-                  trailing: const Icon(
-                    Icons.arrow_forward_ios,
-                    size: 16,
-                  ),
+                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>
-                            ResultadoMedicaoPage(medicao: medicao),
+                        builder: (_) => ResultadoMedicaoPage(medicao: medicao),
                       ),
                     );
                   },

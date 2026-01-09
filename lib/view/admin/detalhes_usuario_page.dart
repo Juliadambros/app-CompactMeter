@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
 import '../../models/usuario_model.dart';
 import '../../models/veiculo_model.dart';
 import '../../models/medicao_model.dart';
@@ -9,15 +11,13 @@ import '../../theme/app_colors.dart';
 class DetalhesUsuarioPage extends StatelessWidget {
   final UsuarioModel usuario;
 
-  const DetalhesUsuarioPage({
-    super.key,
-    required this.usuario,
-  });
+  const DetalhesUsuarioPage({super.key, required this.usuario});
 
   @override
   Widget build(BuildContext context) {
     final veiculoService = VeiculoService();
     final medicaoService = MedicaoService();
+    final formatter = DateFormat('dd/MM/yyyy HH:mm');
 
     return Scaffold(
       backgroundColor: AppColors.fundo,
@@ -28,8 +28,13 @@ class DetalhesUsuarioPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          /// DADOS DO USUÁRIO
           Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             child: ListTile(
+              leading: const Icon(Icons.person),
               title: Text(usuario.nome),
               subtitle: Text(usuario.email),
             ),
@@ -48,7 +53,10 @@ class DetalhesUsuarioPage extends StatelessWidget {
             future: veiculoService.listarVeiculosPorUsuario(usuario.uid),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const CircularProgressIndicator();
+                return const Padding(
+                  padding: EdgeInsets.all(8),
+                  child: CircularProgressIndicator(),
+                );
               }
 
               final veiculos = snapshot.data ?? [];
@@ -58,17 +66,18 @@ class DetalhesUsuarioPage extends StatelessWidget {
               }
 
               return Column(
-                children: veiculos
-                    .map(
-                      (v) => ListTile(
-                        leading: const Icon(Icons.agriculture),
-                        title: Text(v.nome),
-                        subtitle: Text(
-                          'Circunferência: ${v.circunferenciaRoda.toStringAsFixed(2)} m',
-                        ),
+                children: veiculos.map((v) {
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    child: ListTile(
+                      leading: const Icon(Icons.agriculture),
+                      title: Text(v.nome),
+                      subtitle: Text(
+                        'Circunferência da roda: ${v.circunferenciaRoda.toStringAsFixed(2)} m',
                       ),
-                    )
-                    .toList(),
+                    ),
+                  );
+                }).toList(),
               );
             },
           ),
@@ -86,7 +95,10 @@ class DetalhesUsuarioPage extends StatelessWidget {
             future: medicaoService.listarPorUsuario(usuario.uid),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const CircularProgressIndicator();
+                return const Padding(
+                  padding: EdgeInsets.all(8),
+                  child: CircularProgressIndicator(),
+                );
               }
 
               final medicoes = snapshot.data ?? [];
@@ -96,17 +108,35 @@ class DetalhesUsuarioPage extends StatelessWidget {
               }
 
               return Column(
-                children: medicoes
-                    .map(
-                      (m) => ListTile(
-                        leading: const Icon(Icons.calculate),
-                        title: Text(m.nome),
-                        subtitle: Text(
-                          'Patinagem: ${m.patinagem.toStringAsFixed(2)}%',
-                        ),
+                children: medicoes.map((m) {
+                  final dataFormatada = formatter.format(m.data);
+
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ListTile(
+                      leading: const Icon(Icons.calculate),
+                      title: Text(
+                        m.nome,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                    )
-                    .toList(),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 4),
+                          Text('Patinagem: ${m.patinagem.toStringAsFixed(2)}%'),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Data: $dataFormatada',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
               );
             },
           ),
