@@ -4,9 +4,14 @@ import '../../models/usuario_model.dart';
 import '../../service/usuario_service.dart';
 import '../../theme/app_colors.dart';
 
-class GerenciarUsuariosPage extends StatelessWidget {
-  GerenciarUsuariosPage({super.key});
+class GerenciarUsuariosPage extends StatefulWidget {
+  const GerenciarUsuariosPage({super.key});
 
+  @override
+  State<GerenciarUsuariosPage> createState() => _GerenciarUsuariosPageState();
+}
+
+class _GerenciarUsuariosPageState extends State<GerenciarUsuariosPage> {
   final UsuarioService usuarioService = UsuarioService();
 
   @override
@@ -17,8 +22,8 @@ class GerenciarUsuariosPage extends StatelessWidget {
         title: const Text('Gerenciar Usuários'),
         backgroundColor: AppColors.azul,
       ),
-      body: FutureBuilder<List<UsuarioModel>>(
-        future: usuarioService.listarUsuarios(),
+      body: StreamBuilder<List<UsuarioModel>>(
+        stream: usuarioService.streamUsuarios(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

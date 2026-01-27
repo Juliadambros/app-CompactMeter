@@ -1,3 +1,4 @@
+import 'package:app_compactmeter/components/delete_button.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
@@ -33,6 +34,18 @@ class _HistoricoPageState extends State<HistoricoPage> {
   void _carregarHistorico() {
     final uid = FirebaseAuth.instance.currentUser!.uid;
     _futureMedicoes = MedicaoService().listarPorUsuario(uid);
+  }
+
+  Future<void> _excluirMedicao(String medicaoId) async {
+    await MedicaoService().excluirMedicao(medicaoId);
+
+    if (!mounted) return;
+
+    setState(() => _carregarHistorico());
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Medição excluída com sucesso')),
+    );
   }
 
   @override
@@ -99,7 +112,17 @@ class _HistoricoPageState extends State<HistoricoPage> {
                       ),
                     ],
                   ),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      DeleteButton(
+                        mensagem: 'Deseja excluir esta medição?',
+                        onConfirm: () => _excluirMedicao(medicao.id),
+                      ),
+                      const Icon(Icons.arrow_forward_ios, size: 16),
+                    ],
+                  ),
+
                   onTap: () {
                     Navigator.push(
                       context,

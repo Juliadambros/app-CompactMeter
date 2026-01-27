@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../components/delete_button.dart';
 import '../../models/usuario_model.dart';
 import '../../models/veiculo_model.dart';
 import '../../models/medicao_model.dart';
+import '../../service/usuario_service.dart';
 import '../../service/veiculo_service.dart';
 import '../../service/medicao_service.dart';
 import '../../theme/app_colors.dart';
@@ -11,7 +13,47 @@ import '../../theme/app_colors.dart';
 class DetalhesUsuarioPage extends StatelessWidget {
   final UsuarioModel usuario;
 
-  const DetalhesUsuarioPage({super.key, required this.usuario});
+  const DetalhesUsuarioPage({
+    super.key,
+    required this.usuario,
+  });
+
+  Future<void> _excluirUsuario(BuildContext context) async {
+    final usuarioService = UsuarioService();
+    final veiculoService = VeiculoService();
+    final medicaoService = MedicaoService();
+
+    try {
+      final medicoes =
+          await medicaoService.listarPorUsuario(usuario.uid);
+      for (final m in medicoes) {
+        await medicaoService.excluirMedicao(m.id);
+      }
+
+      final veiculos =
+          await veiculoService.listarVeiculosPorUsuario(usuario.uid);
+      for (final v in veiculos) {
+        await veiculoService.excluirVeiculo(v.id);
+      }
+
+      await usuarioService.excluirUsuario(usuario.uid);
+
+      if (context.mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Usuário excluído com sucesso'),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao excluir usuário: $e'),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +70,6 @@ class DetalhesUsuarioPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          /// DADOS DO USUÁRIO
           Card(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -46,7 +87,6 @@ class DetalhesUsuarioPage extends StatelessWidget {
             'Veículos cadastrados',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
-
           const SizedBox(height: 8),
 
           FutureBuilder<List<VeiculoModel>>(
@@ -73,7 +113,8 @@ class DetalhesUsuarioPage extends StatelessWidget {
                       leading: const Icon(Icons.agriculture),
                       title: Text(v.nome),
                       subtitle: Text(
-                        'Circunferência da roda: ${v.circunferenciaRoda.toStringAsFixed(2)} m',
+                        'Circunferência da roda: '
+                        '${v.circunferenciaRoda.toStringAsFixed(2)} m',
                       ),
                     ),
                   );
@@ -88,7 +129,6 @@ class DetalhesUsuarioPage extends StatelessWidget {
             'Medições realizadas',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
-
           const SizedBox(height: 8),
 
           FutureBuilder<List<MedicaoModel>>(
@@ -126,7 +166,10 @@ class DetalhesUsuarioPage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(height: 4),
-                          Text('Patinagem: ${m.patinagem.toStringAsFixed(2)}%'),
+                          Text(
+                            'Patinagem: '
+                            '${m.patinagem.toStringAsFixed(2)}%',
+                          ),
                           const SizedBox(height: 4),
                           Text(
                             'Data: $dataFormatada',
@@ -140,8 +183,22 @@ class DetalhesUsuarioPage extends StatelessWidget {
               );
             },
           ),
+
+          const SizedBox(height: 32),
+          const Divider(),
+          const SizedBox(height: 16),
+
+          DeleteButton(
+            titulo: 'Excluir usuário',
+            mensagem:
+                'Este usuário será removido do sistema.\n'
+                'Todos os veículos e medições também serão excluídos.\n\n'
+                'Essa ação não pode ser desfeita.',
+            onConfirm: () => _excluirUsuario(context),
+          ),
         ],
       ),
     );
   }
 }
+

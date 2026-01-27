@@ -34,4 +34,8 @@ class MedicaoService {
     final distanciaTeorica = rotacoes * circunferenciaRoda;
     return ((distanciaTeorica - distanciaReal) / distanciaTeorica) * 100;
   }
+
+  Future<void> excluirMedicao(String id) async {
+    await medicoes.doc(id).delete();
+  }
 }

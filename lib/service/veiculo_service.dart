@@ -2,8 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/veiculo_model.dart';
 
 class VeiculoService {
-  final CollectionReference veiculos =
-      FirebaseFirestore.instance.collection('veiculos');
+  final CollectionReference veiculos = FirebaseFirestore.instance.collection(
+    'veiculos',
+  );
 
   Future<void> salvarVeiculo(VeiculoModel veiculo) async {
     await veiculos.doc(veiculo.id).set(veiculo.toMap());
@@ -17,9 +18,7 @@ class VeiculoService {
   }
 
   Future<List<VeiculoModel>> listarVeiculosPorUsuario(String uid) async {
-    final snapshot = await veiculos
-        .where('usuarioId', isEqualTo: uid)
-        .get();
+    final snapshot = await veiculos.where('usuarioId', isEqualTo: uid).get();
 
     return snapshot.docs
         .map((d) => VeiculoModel.fromMap(d.data() as Map<String, dynamic>))
@@ -31,5 +30,9 @@ class VeiculoService {
     if (!doc.exists) return null;
 
     return VeiculoModel.fromMap(doc.data() as Map<String, dynamic>);
+  }
+
+  Future<void> excluirVeiculo(String id) async {
+    await veiculos.doc(id).delete();
   }
 }

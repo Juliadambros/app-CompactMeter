@@ -5,4 +5,5 @@ class AppColors {
   static const verde = Color(0xFF4CAF50);
   static const verdeClaro = Color(0xFFA5D6A7);
   static const fundo = Color(0xFFF5F7FA);
+  static const vermelho = Color(0xFFE53935);
 }

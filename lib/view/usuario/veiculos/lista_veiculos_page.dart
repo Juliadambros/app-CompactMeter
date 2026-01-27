@@ -1,3 +1,4 @@
+import 'package:app_compactmeter/components/delete_button.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -31,14 +32,24 @@ class _ListaVeiculosPageState extends State<ListaVeiculosPage> {
   Future<void> _abrirCadastro() async {
     final atualizado = await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => const CadastroVeiculoPage(),
-      ),
+      MaterialPageRoute(builder: (_) => const CadastroVeiculoPage()),
     );
 
     if (atualizado == true) {
       setState(() => _carregarVeiculos());
     }
+  }
+
+  Future<void> _excluirVeiculo(String veiculoId) async {
+    await VeiculoService().excluirVeiculo(veiculoId);
+
+    if (!mounted) return;
+
+    setState(() => _carregarVeiculos());
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Veículo excluído com sucesso')),
+    );
   }
 
   @override
@@ -62,9 +73,7 @@ class _ListaVeiculosPageState extends State<ListaVeiculosPage> {
           }
 
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text('Nenhum veículo cadastrado'),
-            );
+            return const Center(child: Text('Nenhum veículo cadastrado'));
           }
 
           final veiculos = snapshot.data!;
@@ -82,13 +91,14 @@ class _ListaVeiculosPageState extends State<ListaVeiculosPage> {
                 ),
                 elevation: 3,
                 child: ListTile(
-                  leading: Icon(
-                    Icons.agriculture,
-                    color: AppColors.verde,
-                  ),
+                  leading: Icon(Icons.agriculture, color: AppColors.verde),
                   title: Text(veiculo.nome),
                   subtitle: Text(
                     'Circunferência: ${veiculo.circunferenciaRoda.toStringAsFixed(2)} m',
+                  ),
+                  trailing: DeleteButton(
+                    mensagem: 'Deseja excluir este veículo?',
+                    onConfirm: () => _excluirVeiculo(veiculo.id),
                   ),
                 ),
               );
