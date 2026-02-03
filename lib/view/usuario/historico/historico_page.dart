@@ -1,7 +1,6 @@
 import 'package:app_compactmeter/components/delete_button.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:intl/intl.dart';
 
 import '../../../models/medicao_model.dart';
 import '../../../service/medicao_service.dart';
@@ -77,14 +76,13 @@ class _HistoricoPageState extends State<HistoricoPage> {
           }
 
           final medicoes = snapshot.data!;
-          final formatter = DateFormat('dd/MM/yyyy HH:mm');
 
           return ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: medicoes.length,
             itemBuilder: (context, index) {
               final medicao = medicoes[index];
-              final dataFormatada = formatter.format(medicao.data);
+              
 
               return Card(
                 margin: const EdgeInsets.only(bottom: 12),
@@ -105,11 +103,7 @@ class _HistoricoPageState extends State<HistoricoPage> {
                       Text(
                         'Patinagem: ${medicao.patinagem.toStringAsFixed(2)}%',
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Data: $dataFormatada',
-                        style: const TextStyle(fontSize: 12),
-                      ),
+                      
                     ],
                   ),
                   trailing: Row(

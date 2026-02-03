@@ -93,9 +93,16 @@ class _ListaVeiculosPageState extends State<ListaVeiculosPage> {
                 child: ListTile(
                   leading: Icon(Icons.agriculture, color: AppColors.verde),
                   title: Text(veiculo.nome),
-                  subtitle: Text(
-                    'Circunferência: ${veiculo.circunferenciaRoda.toStringAsFixed(2)} m',
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Tipo: ${veiculo.tipo}'),
+                      Text(
+                        'Circunferência: ${veiculo.circunferenciaRoda.toStringAsFixed(2)} m',
+                      ),
+                    ],
                   ),
+
                   trailing: DeleteButton(
                     mensagem: 'Deseja excluir este veículo?',
                     onConfirm: () => _excluirVeiculo(veiculo.id),

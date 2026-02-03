@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -22,6 +21,8 @@ class NovaMedicaoPage extends StatefulWidget {
 class _NovaMedicaoPageState extends State<NovaMedicaoPage> {
   final _nomeController = TextEditingController();
   final _propriedadeController = TextEditingController();
+  final _distanciaController = TextEditingController();
+  final _grausController = TextEditingController();
 
   VeiculoModel? _veiculoSelecionado;
   List<VeiculoModel> _veiculos = [];
@@ -44,25 +45,29 @@ class _NovaMedicaoPageState extends State<NovaMedicaoPage> {
     });
   }
 
-  void _iniciarMedicao() async {
+  Future<void> _iniciarMedicao() async {
     if (_nomeController.text.isEmpty ||
         _propriedadeController.text.isEmpty ||
+        _distanciaController.text.isEmpty ||
+        _grausController.text.isEmpty ||
         _veiculoSelecionado == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Preencha todos os campos')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Preencha todos os campos')),
+      );
       return;
     }
 
     final uid = FirebaseAuth.instance.currentUser!.uid;
-    final random = Random();
 
-    final distanciaReal = 100 + random.nextDouble() * 50;
-    final rotacoes = 80 + random.nextInt(40);
+    final distanciaInformada =
+        double.tryParse(_distanciaController.text) ?? 0;
+
+    final grausAcumulados =
+        double.tryParse(_grausController.text) ?? 0;
 
     final patinagem = MedicaoService.calcularPatinagem(
-      distanciaReal: distanciaReal,
-      rotacoes: rotacoes,
+      distanciaInformada: distanciaInformada,
+      grausAcumulados: grausAcumulados,
       circunferenciaRoda: _veiculoSelecionado!.circunferenciaRoda,
     );
 
@@ -71,10 +76,10 @@ class _NovaMedicaoPageState extends State<NovaMedicaoPage> {
       nome: _nomeController.text,
       propriedade: _propriedadeController.text,
       veiculoId: _veiculoSelecionado!.id,
-      distanciaReal: distanciaReal,
-      rotacoes: rotacoes,
+      distanciaInformada: distanciaInformada,
+      grausAcumulados: grausAcumulados,
       patinagem: patinagem,
-      data: DateTime.now(),
+     
       usuarioId: uid,
     );
 
@@ -84,7 +89,9 @@ class _NovaMedicaoPageState extends State<NovaMedicaoPage> {
 
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => ResultadoMedicaoPage(medicao: medicao)),
+      MaterialPageRoute(
+        builder: (_) => ResultadoMedicaoPage(medicao: medicao),
+      ),
     );
   }
 
@@ -119,17 +126,31 @@ class _NovaMedicaoPageState extends State<NovaMedicaoPage> {
                     ),
                     items: _veiculos
                         .map(
-                          (v) =>
-                              DropdownMenuItem(value: v, child: Text(v.nome)),
+                          (v) => DropdownMenuItem(
+                            value: v,
+                            child: Text(v.nome),
+                          ),
                         )
                         .toList(),
                     onChanged: (v) {
                       setState(() => _veiculoSelecionado = v);
                     },
                   ),
+                  const SizedBox(height: 16),
+                  AppTextField(
+                    controller: _distanciaController,
+                    label: 'Distância percorrida (m)',
+                    keyboardType: TextInputType.number,
+                  ),
+                  const SizedBox(height: 16),
+                  AppTextField(
+                    controller: _grausController,
+                    label: 'Graus acumulados da roda (°)',
+                    keyboardType: TextInputType.number,
+                  ),
                   const SizedBox(height: 32),
                   AppButton(
-                    texto: 'Iniciar medição',
+                    texto: 'Calcular Medição',
                     onPressed: _iniciarMedicao,
                   ),
                 ],

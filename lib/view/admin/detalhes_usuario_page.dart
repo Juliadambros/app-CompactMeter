@@ -59,7 +59,6 @@ class DetalhesUsuarioPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final veiculoService = VeiculoService();
     final medicaoService = MedicaoService();
-    final formatter = DateFormat('dd/MM/yyyy HH:mm');
 
     return Scaffold(
       backgroundColor: AppColors.fundo,
@@ -149,7 +148,6 @@ class DetalhesUsuarioPage extends StatelessWidget {
 
               return Column(
                 children: medicoes.map((m) {
-                  final dataFormatada = formatter.format(m.data);
 
                   return Card(
                     margin: const EdgeInsets.only(bottom: 8),
@@ -169,11 +167,6 @@ class DetalhesUsuarioPage extends StatelessWidget {
                           Text(
                             'Patinagem: '
                             '${m.patinagem.toStringAsFixed(2)}%',
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Data: $dataFormatada',
-                            style: const TextStyle(fontSize: 12),
                           ),
                         ],
                       ),

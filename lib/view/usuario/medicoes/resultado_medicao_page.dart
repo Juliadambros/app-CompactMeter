@@ -27,9 +27,8 @@ class _ResultadoMedicaoPageState extends State<ResultadoMedicaoPage> {
   }
 
   Future<void> _carregarVeiculo() async {
-    final veiculo = await VeiculoService().buscarPorId(
-      widget.medicao.veiculoId,
-    );
+    final veiculo =
+        await VeiculoService().buscarPorId(widget.medicao.veiculoId);
 
     setState(() {
       _veiculo = veiculo;
@@ -68,22 +67,23 @@ class _ResultadoMedicaoPageState extends State<ResultadoMedicaoPage> {
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 16),
+
                   Text('Veículo: ${_veiculo?.nome ?? '-'}'),
                   const SizedBox(height: 8),
                   Text(
                     'Patinagem: ${widget.medicao.patinagem.toStringAsFixed(2)} %',
-                    style: TextStyle(color: AppColors.verde, fontSize: 20),
+                    style: TextStyle(
+                      color: AppColors.verde,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  const SizedBox(height: 24),
-
+                  const SizedBox(height: 32),
                   DeleteButton(
                     mensagem: 'Deseja excluir esta medição?',
                     onConfirm: _excluirMedicao,
                   ),
-
-                  const SizedBox(height: 16),
-
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
                   AppButton(
                     texto: 'Voltar para Home',
                     onPressed: () {
