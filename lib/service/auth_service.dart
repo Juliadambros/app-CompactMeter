@@ -9,7 +9,14 @@ class AuthService {
         email: email,
         password: senha,
       );
-      return (result.user, null);
+
+      final user = result.user;
+
+      if (user != null && !user.emailVerified) {
+        await user.sendEmailVerification();
+      }
+
+      return (user, null);
     } on FirebaseAuthException catch (e) {
       String mensagem;
 
@@ -17,15 +24,12 @@ class AuthService {
         case 'weak-password':
           mensagem = "A senha deve conter no mínimo 6 caracteres.";
           break;
-
         case 'email-already-in-use':
           mensagem = "Este email já está cadastrado.";
           break;
-
         case 'invalid-email':
           mensagem = "Email inválido.";
           break;
-
         default:
           mensagem = "Erro ao cadastrar: ${e.code}";
       }
@@ -41,7 +45,6 @@ class AuthService {
         password: senha,
       );
       return (result.user, null);
-
     } on FirebaseAuthException catch (e) {
       String mensagem;
 
@@ -68,27 +71,41 @@ class AuthService {
     }
   }
 
+  Future<String?> reenviarEmailVerificacao() async {
+  try {
+    final user = _auth.currentUser;
+
+    if (user != null && !user.emailVerified) {
+      await user.sendEmailVerification();
+      return null;
+    }
+
+    return 'Usuário inválido ou já verificado.';
+  } on FirebaseAuthException catch (e) {
+    return 'Erro ao reenviar e-mail: ${e.code}';
+  }
+}
+
+
   Future<void> sair() async {
     await _auth.signOut();
   }
 
   Future<String?> recuperarSenha(String email) async {
-  try {
-    await _auth.sendPasswordResetEmail(email: email);
-    return null; 
-  } on FirebaseAuthException catch (e) {
-    switch (e.code) {
-      case 'invalid-email':
-        return 'Email inválido.';
-      case 'user-not-found':
-        return 'Nenhuma conta encontrada para este email.';
-      default:
-        return 'Erro ao enviar email: ${e.code}';
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      return null;
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case 'invalid-email':
+          return 'Email inválido.';
+        case 'user-not-found':
+          return 'Nenhuma conta encontrada para este email.';
+        default:
+          return 'Erro ao enviar email: ${e.code}';
+      }
     }
   }
-}
 
   User? usuarioAtual() => _auth.currentUser;
 }
-
-

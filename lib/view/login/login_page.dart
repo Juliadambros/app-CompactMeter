@@ -1,4 +1,3 @@
-import 'package:app_compactmeter/view/login/recuperar_senha_page.dart';
 import 'package:flutter/material.dart';
 import '../../components/app_button.dart';
 import '../../components/app_header.dart';
@@ -8,6 +7,7 @@ import '../../service/usuario_service.dart';
 import '../admin/home_admin.dart';
 import '../usuario/home_usuario.dart';
 import '../../theme/app_colors.dart';
+import 'recuperar_senha_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -23,55 +23,100 @@ class _LoginPageState extends State<LoginPage> {
   final authService = AuthService();
   final usuarioService = UsuarioService();
 
+  bool emailNaoVerificado = false;
   bool loading = false;
 
+  void mostrarPopup({
+    required String titulo,
+    required String mensagem,
+    IconData icone = Icons.error_outline,
+    Color cor = Colors.red,
+  }) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Icon(icone, color: cor),
+            const SizedBox(width: 8),
+            Expanded(child: Text(titulo)),
+          ],
+        ),
+        content: Text(mensagem),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> login() async {
+    if (emailCtrl.text.trim().isEmpty) {
+      mostrarPopup(titulo: 'Campo obrigatório', mensagem: 'Informe o email.');
+      return;
+    }
+
+    if (senhaCtrl.text.isEmpty) {
+      mostrarPopup(titulo: 'Campo obrigatório', mensagem: 'Informe a senha.');
+      return;
+    }
     setState(() => loading = true);
 
-    try {
-      final (user, erro) = await authService.entrar(
-        emailCtrl.text,
-        senhaCtrl.text,
+    final (user, erro) = await authService.entrar(
+      emailCtrl.text,
+      senhaCtrl.text,
+    );
+
+    if (erro != null) {
+      setState(() => loading = false);
+      mostrarPopup(titulo: 'Erro ao entrar', mensagem: erro);
+      return;
+    }
+
+    final usuario = await usuarioService.buscarUsuario(user!.uid);
+
+    if (!mounted) return;
+
+    if (usuario == null) {
+      setState(() => loading = false);
+      mostrarPopup(
+        titulo: 'Usuário não encontrado',
+        mensagem: 'Não foi possível localizar os dados do usuário.',
       );
+      return;
+    }
 
-      if (erro != null) {
-        setState(() => loading = false);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(erro)));
-        return;
-      }
+    if (!user.emailVerified) {
+      setState(() {
+        loading = false;
+        emailNaoVerificado = true;
+      });
 
-      final usuario = await usuarioService.buscarUsuario(user!.uid);
+      mostrarPopup(
+        titulo: 'E-mail não verificado',
+        mensagem: 'Verifique sua caixa de entrada para ativar a conta.',
+        icone: Icons.mail_outline,
+        cor: Colors.orange,
+      );
+      return;
+    }
 
-      if (!mounted) return;
+    setState(() => loading = false);
 
-      if (usuario == null) {
-        setState(() => loading = false);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Usuário não encontrado')));
-        return;
-      }
-
-      setState(() => loading = false);
-
-      if (usuario.tipoUsuario == 'admin') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const HomeAdmin()),
-        );
-      } else {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const HomeUsuario()),
-        );
-      }
-    } catch (e) {
-      setState(() => loading = false);
-      ScaffoldMessenger.of(
+    if (usuario.tipoUsuario == 'admin') {
+      Navigator.pushReplacement(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Erro ao realizar login')));
+        MaterialPageRoute(builder: (_) => const HomeAdmin()),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomeUsuario()),
+      );
     }
   }
 
@@ -98,12 +143,34 @@ class _LoginPageState extends State<LoginPage> {
             child: Padding(
               padding: const EdgeInsets.all(24),
               child: Column(
-                mainAxisSize: MainAxisSize.min,
                 children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Image.asset(
+                          'assets/imgs/nmap.jpg',
+                          height: 50,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Flexible(
+                        child: Image.asset(
+                          'assets/imgs/unicentro.png',
+                          height: 50,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
                   const AppHeader(
                     titulo: 'CompactMeter',
                     subtitulo: 'Acesse sua conta',
                   ),
+
                   const SizedBox(height: 24),
 
                   AppTextField(
@@ -126,12 +193,32 @@ class _LoginPageState extends State<LoginPage> {
                     onPressed: login,
                   ),
 
-                  const SizedBox(height: 16),
+                  if (emailNaoVerificado)
+                    TextButton(
+                      onPressed: () async {
+                        final erro = await authService
+                            .reenviarEmailVerificacao();
+
+                        if (erro != null) {
+                          mostrarPopup(titulo: 'Erro', mensagem: erro);
+                        } else {
+                          mostrarPopup(
+                            titulo: 'E-mail reenviado',
+                            mensagem:
+                                'O e-mail de verificação foi enviado novamente.',
+                            icone: Icons.check_circle_outline,
+                            cor: Colors.green,
+                          );
+                        }
+                      },
+                      child: Text(
+                        'Reenviar e-mail de verificação',
+                        style: TextStyle(color: AppColors.azul),
+                      ),
+                    ),
 
                   TextButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/cadastro');
-                    },
+                    onPressed: () => Navigator.pushNamed(context, '/cadastro'),
                     child: Text(
                       'Criar conta',
                       style: TextStyle(color: AppColors.azul),

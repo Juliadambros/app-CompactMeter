@@ -24,27 +24,82 @@ class _CadastroPageState extends State<CadastroPage> {
 
   bool loading = false;
 
+  void mostrarPopup({
+    required String titulo,
+    required String mensagem,
+    IconData icone = Icons.error_outline,
+    Color cor = Colors.red,
+  }) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Icon(icone, color: cor),
+            const SizedBox(width: 8),
+            Expanded(child: Text(titulo)),
+          ],
+        ),
+        content: Text(mensagem),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> cadastrar() async {
+    if (nomeCtrl.text.trim().isEmpty) {
+      mostrarPopup(titulo: 'Campo obrigatório', mensagem: 'Informe o nome.');
+      return;
+    }
+
+    if (emailCtrl.text.trim().isEmpty) {
+      mostrarPopup(titulo: 'Campo obrigatório', mensagem: 'Informe o email.');
+      return;
+    }
+
+    if (senhaCtrl.text.isEmpty) {
+      mostrarPopup(titulo: 'Campo obrigatório', mensagem: 'Informe a senha.');
+      return;
+    }
+
+    if (senhaCtrl.text.length < 6) {
+      mostrarPopup(
+        titulo: 'Senha fraca',
+        mensagem: 'A senha deve ter no mínimo 6 caracteres.',
+      );
+      return;
+    }
+
     setState(() => loading = true);
 
     try {
       final (user, erro) = await authService.cadastrar(
-        emailCtrl.text,
+        emailCtrl.text.trim(),
         senhaCtrl.text,
       );
 
       if (erro != null) {
         setState(() => loading = false);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(erro)));
+
+        mostrarPopup(
+          titulo: 'Erro no cadastro',
+          mensagem: erro,
+          icone: Icons.warning_amber_rounded,
+          cor: Colors.orange,
+        );
         return;
       }
 
       final usuario = UsuarioModel(
         uid: user!.uid,
-        nome: nomeCtrl.text,
-        email: emailCtrl.text,
+        nome: nomeCtrl.text.trim(),
+        email: emailCtrl.text.trim(),
         tipoUsuario: 'usuario',
       );
 
@@ -53,11 +108,22 @@ class _CadastroPageState extends State<CadastroPage> {
       if (!mounted) return;
 
       setState(() => loading = false);
+
+      mostrarPopup(
+        titulo: 'Cadastro realizado',
+        mensagem:
+            'Conta criada com sucesso.\nVerifique seu e-mail para ativar a conta.',
+        icone: Icons.check_circle_outline,
+        cor: Colors.green,
+      );
+
       Navigator.pop(context);
     } catch (e) {
       setState(() => loading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erro ao cadastrar usuário')),
+
+      mostrarPopup(
+        titulo: 'Erro inesperado',
+        mensagem: 'Erro ao cadastrar usuário.',
       );
     }
   }
@@ -86,6 +152,28 @@ class _CadastroPageState extends State<CadastroPage> {
               padding: const EdgeInsets.all(24),
               child: Column(
                 children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Image.asset(
+                          'assets/imgs/nmap.jpg',
+                          height: 50,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Flexible(
+                        child: Image.asset(
+                          'assets/imgs/unicentro.png',
+                          height: 50,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
                   const AppHeader(
                     titulo: 'Criar conta',
                     subtitulo: 'Preencha os dados abaixo',
