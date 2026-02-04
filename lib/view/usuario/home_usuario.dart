@@ -1,5 +1,8 @@
 import 'package:app_compactmeter/view/usuario/historico/historico_page.dart';
+import 'package:app_compactmeter/view/usuario/informacoes/como_funciona_page.dart';
 import 'package:app_compactmeter/view/usuario/medicoes/nova_medicao_page.dart';
+import 'package:app_compactmeter/view/usuario/propriedades/lista_propriedades_page.dart';
+import 'package:app_compactmeter/view/usuario/sobre/sobre_page.dart';
 import 'package:app_compactmeter/view/usuario/veiculos/lista_veiculos_page.dart';
 import 'package:flutter/material.dart';
 import '../../service/auth_service.dart';
@@ -42,14 +45,28 @@ class HomeUsuario extends StatelessWidget {
             const SizedBox(height: 8),
 
             const Text(
-              'Aqui será possível acompanhar os dados coletados pelo CompactMeter.',
+              'Gerencie propriedades, máquinas e medições de forma simples e organizada.',
             ),
 
             const SizedBox(height: 32),
 
             _CardFuncionalidade(
+              icon: Icons.home_work,
+              titulo: 'Propriedades',
+              descricao: 'Cadastrar e gerenciar propriedades',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ListaPropriedadesPage(),
+                  ),
+                );
+              },
+            ),
+
+            _CardFuncionalidade(
               icon: Icons.agriculture,
-              titulo: 'Dados dos veículos',
+              titulo: 'Máquinas agrícolas',
               descricao: 'Visualizar/Cadastrar veículos',
               onTap: () {
                 Navigator.push(
@@ -61,7 +78,7 @@ class HomeUsuario extends StatelessWidget {
 
             _CardFuncionalidade(
               icon: Icons.calculate,
-              titulo: 'Medições',
+              titulo: 'Nova medição de patinagem',
               descricao: 'Solicitar medições',
               onTap: () {
                 Navigator.push(
@@ -79,6 +96,30 @@ class HomeUsuario extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const HistoricoPage()),
+                );
+              },
+            ),
+
+            _CardFuncionalidade(
+              icon: Icons.info_outline,
+              titulo: 'Como funciona',
+              descricao: 'Fórmulas e metodologia utilizada',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ComoFuncionaPage()),
+                );
+              },
+            ),
+
+            _CardFuncionalidade(
+              icon: Icons.groups_outlined,
+              titulo: 'Sobre o projeto',
+              descricao: 'Informações sobre o CompactMeter',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SobrePage()),
                 );
               },
             ),
