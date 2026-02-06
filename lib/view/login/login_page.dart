@@ -120,149 +120,148 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    backgroundColor: AppColors.fundo,
-    body: SafeArea(
-      child: Column(
-        children: [
-          const Spacer(),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.fundo,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              const SizedBox(height: 40),
 
-          // ===== CAIXA DE LOGIN (CENTRO REAL) =====
-          Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Container(
-                constraints: const BoxConstraints(maxWidth: 420),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.12),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    children: [
-                      const AppHeader(
-                        titulo: 'CompactMeter',
-                        subtitulo: 'Acesse sua conta',
+              Center(
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 420),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.12),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
                       ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      children: [
+                        const AppHeader(
+                          titulo: 'CompactMeter',
+                          subtitulo: 'Acesse sua conta',
+                        ),
 
-                      const SizedBox(height: 24),
+                        const SizedBox(height: 24),
 
-                      AppTextField(
-                        controller: emailCtrl,
-                        label: 'Email',
-                        keyboardType: TextInputType.emailAddress,
-                      ),
-                      const SizedBox(height: 16),
+                        AppTextField(
+                          controller: emailCtrl,
+                          label: 'Email',
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                        const SizedBox(height: 16),
 
-                      AppTextField(
-                        controller: senhaCtrl,
-                        label: 'Senha',
-                        obscure: true,
-                      ),
-                      const SizedBox(height: 24),
+                        AppTextField(
+                          controller: senhaCtrl,
+                          label: 'Senha',
+                          obscure: true,
+                        ),
+                        const SizedBox(height: 24),
 
-                      AppButton(
-                        texto: 'Entrar',
-                        loading: loading,
-                        onPressed: login,
-                      ),
+                        AppButton(
+                          texto: 'Entrar',
+                          loading: loading,
+                          onPressed: login,
+                        ),
 
-                      if (emailNaoVerificado)
+                        if (emailNaoVerificado)
+                          TextButton(
+                            onPressed: () async {
+                              final erro = await authService
+                                  .reenviarEmailVerificacao();
+
+                              if (erro != null) {
+                                mostrarPopup(titulo: 'Erro', mensagem: erro);
+                              } else {
+                                mostrarPopup(
+                                  titulo: 'E-mail reenviado',
+                                  mensagem:
+                                      'O e-mail de verificação foi enviado novamente.',
+                                  icone: Icons.check_circle_outline,
+                                  cor: Colors.green,
+                                );
+                              }
+                            },
+                            child: Text(
+                              'Reenviar e-mail de verificação',
+                              style: TextStyle(color: AppColors.azul),
+                            ),
+                          ),
+
                         TextButton(
-                          onPressed: () async {
-                            final erro =
-                                await authService.reenviarEmailVerificacao();
-
-                            if (erro != null) {
-                              mostrarPopup(titulo: 'Erro', mensagem: erro);
-                            } else {
-                              mostrarPopup(
-                                titulo: 'E-mail reenviado',
-                                mensagem:
-                                    'O e-mail de verificação foi enviado novamente.',
-                                icone: Icons.check_circle_outline,
-                                cor: Colors.green,
-                              );
-                            }
-                          },
+                          onPressed: () =>
+                              Navigator.pushNamed(context, '/cadastro'),
                           child: Text(
-                            'Reenviar e-mail de verificação',
+                            'Criar conta',
                             style: TextStyle(color: AppColors.azul),
                           ),
                         ),
 
-                      TextButton(
-                        onPressed: () =>
-                            Navigator.pushNamed(context, '/cadastro'),
-                        child: Text(
-                          'Criar conta',
-                          style: TextStyle(color: AppColors.azul),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const RecuperarSenhaPage(),
+                              ),
+                            );
+                          },
+                          child: const Text(
+                            'Esqueceu a senha?',
+                            style: TextStyle(color: Colors.grey),
+                          ),
                         ),
-                      ),
-
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const RecuperarSenhaPage(),
-                            ),
-                          );
-                        },
-                        child: const Text(
-                          'Esqueceu a senha?',
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
 
-          const Spacer(),
+              const SizedBox(height: 40),
 
-          // ===== LOGOS NO RODAPÉ =====
-          Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              Column(
                 children: [
-                  Image.asset('assets/imgs/nmap.png', height: 50),
-                  const SizedBox(width: 20),
-                  Image.asset('assets/imgs/unicentro.png', height: 50),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset('assets/imgs/nmap.png', height: 50),
+                      const SizedBox(width: 20),
+                      Image.asset('assets/imgs/unicentro.png', height: 50),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/imgs/logo_CienciaComputacao.png',
+                        height: 40,
+                      ),
+                      const SizedBox(width: 16),
+                      Image.asset('assets/imgs/logobigdata.png', height: 30),
+                      const SizedBox(width: 16),
+                      Image.asset('assets/imgs/agronomia.png', height: 40),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
                 ],
               ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset('assets/imgs/logo_CienciaComputacao.png', height: 40),
-                  const SizedBox(width: 16),
-                  Image.asset('assets/imgs/logobigdata.png', height: 30),
-                  const SizedBox(width: 16),
-                  Image.asset('assets/imgs/agronomia.png', height: 40),
-                ],
-              ),
-              const SizedBox(height: 24),
             ],
           ),
-        ],
+        ),
       ),
-    ),
-  );
-}
-
-
+    );
+  }
 }

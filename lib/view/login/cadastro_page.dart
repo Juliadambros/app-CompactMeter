@@ -132,86 +132,102 @@ class _CadastroPageState extends State<CadastroPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.fundo,
-      body: Center(
+      body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 420),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.12),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
+          child: Column(
+            children: [
+              const SizedBox(height: 24),
+
+              Center(
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 420),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.12),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      children: [
+                        const AppHeader(
+                          titulo: 'Criar conta',
+                          subtitulo: 'Preencha os dados abaixo',
+                        ),
+                        const SizedBox(height: 24),
+
+                        AppTextField(controller: nomeCtrl, label: 'Nome'),
+                        const SizedBox(height: 16),
+
+                        AppTextField(
+                          controller: emailCtrl,
+                          label: 'Email',
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                        const SizedBox(height: 16),
+
+                        AppTextField(
+                          controller: senhaCtrl,
+                          label: 'Senha',
+                          obscure: true,
+                        ),
+                        const SizedBox(height: 24),
+
+                        AppButton(
+                          texto: 'Cadastrar',
+                          loading: loading,
+                          onPressed: cadastrar,
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Voltar'),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
+              ),
+
+              const SizedBox(height: 32),
+
+              Column(
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Flexible(
-                        child: Image.asset(
-                          'assets/imgs/nmap.jpg',
-                          height: 50,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Flexible(
-                        child: Image.asset(
-                          'assets/imgs/unicentro.png',
-                          height: 50,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
+                      Image.asset('assets/imgs/nmap.png', height: 50),
+                      const SizedBox(width: 20),
+                      Image.asset('assets/imgs/unicentro.png', height: 50),
                     ],
                   ),
-
-                  const SizedBox(height: 16),
-                  const AppHeader(
-                    titulo: 'Criar conta',
-                    subtitulo: 'Preencha os dados abaixo',
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/imgs/logo_CienciaComputacao.png',
+                        height: 40,
+                      ),
+                      const SizedBox(width: 16),
+                      Image.asset('assets/imgs/logobigdata.png', height: 30),
+                      const SizedBox(width: 16),
+                      Image.asset('assets/imgs/agronomia.png', height: 40),
+                    ],
                   ),
                   const SizedBox(height: 24),
-
-                  AppTextField(controller: nomeCtrl, label: 'Nome'),
-                  const SizedBox(height: 16),
-
-                  AppTextField(
-                    controller: emailCtrl,
-                    label: 'Email',
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                  const SizedBox(height: 16),
-
-                  AppTextField(
-                    controller: senhaCtrl,
-                    label: 'Senha',
-                    obscure: true,
-                  ),
-                  const SizedBox(height: 24),
-
-                  AppButton(
-                    texto: 'Cadastrar',
-                    loading: loading,
-                    onPressed: cadastrar,
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Voltar'),
-                  ),
                 ],
               ),
-            ),
+            ],
           ),
         ),
       ),
