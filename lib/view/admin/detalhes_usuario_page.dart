@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../../components/delete_button.dart';
 import '../../models/usuario_model.dart';
