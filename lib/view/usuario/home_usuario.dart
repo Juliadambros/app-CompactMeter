@@ -32,7 +32,7 @@ class HomeUsuario extends StatelessWidget {
           ),
         ],
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,7 +45,7 @@ class HomeUsuario extends StatelessWidget {
             const SizedBox(height: 8),
 
             const Text(
-              'Gerencie propriedades, máquinas e medições de forma simples e organizada.',
+              'Gerencie a patinagem e avalie a compactação do solo de forma simples e organizada.',
             ),
 
             const SizedBox(height: 32),
@@ -53,7 +53,7 @@ class HomeUsuario extends StatelessWidget {
             _CardFuncionalidade(
               icon: Icons.home_work,
               titulo: 'Propriedades',
-              descricao: 'Cadastrar e gerenciar propriedades',
+              descricao: 'Cadastrar Propriedades',
               onTap: () {
                 Navigator.push(
                   context,
@@ -67,11 +67,13 @@ class HomeUsuario extends StatelessWidget {
             _CardFuncionalidade(
               icon: Icons.agriculture,
               titulo: 'Máquinas agrícolas',
-              descricao: 'Visualizar/Cadastrar veículos',
+              descricao: 'Cadastrar/Visualizar máquinas agrícolas',
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const ListaVeiculosPage()),
+                  MaterialPageRoute(
+                    builder: (_) => const ListaVeiculosPage(),
+                  ),
                 );
               },
             ),
@@ -79,11 +81,27 @@ class HomeUsuario extends StatelessWidget {
             _CardFuncionalidade(
               icon: Icons.calculate,
               titulo: 'Nova medição de patinagem',
-              descricao: 'Solicitar medições',
+              descricao: 'Iniciar medição de patinagem',
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const NovaMedicaoPage()),
+                  MaterialPageRoute(
+                    builder: (_) => const NovaMedicaoPage(),
+                  ),
+                );
+              },
+            ),
+
+            _CardFuncionalidade(
+              icon: Icons.calculate,
+              titulo: 'Nova medição de Índice de Compactação',
+              descricao: 'Iniciar medição de compactação',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const HomeUsuario(),
+                  ),
                 );
               },
             ),
@@ -91,38 +109,46 @@ class HomeUsuario extends StatelessWidget {
             _CardFuncionalidade(
               icon: Icons.history,
               titulo: 'Histórico',
-              descricao: 'Ver registros anteriores',
+              descricao: 'Ver medições anteriores',
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const HistoricoPage()),
+                  MaterialPageRoute(
+                    builder: (_) => const HistoricoPage(),
+                  ),
                 );
               },
             ),
 
             _CardFuncionalidade(
               icon: Icons.info_outline,
-              titulo: 'Como funciona',
-              descricao: 'Fórmulas e metodologia utilizada',
+              titulo: 'Sobre o CompactMeter',
+              descricao: 'Informações gerais',
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const ComoFuncionaPage()),
+                  MaterialPageRoute(
+                    builder: (_) => const ComoFuncionaPage(),
+                  ),
                 );
               },
             ),
 
             _CardFuncionalidade(
               icon: Icons.groups_outlined,
-              titulo: 'Sobre o projeto',
+              titulo: 'Sobre Nós',
               descricao: 'Informações sobre o CompactMeter',
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const SobrePage()),
+                  MaterialPageRoute(
+                    builder: (_) => const SobrePage(),
+                  ),
                 );
               },
             ),
+
+            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -147,7 +173,9 @@ class _CardFuncionalidade extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
       elevation: 3,
       child: ListTile(
         leading: Icon(icon, size: 32, color: AppColors.verde),
@@ -159,3 +187,4 @@ class _CardFuncionalidade extends StatelessWidget {
     );
   }
 }
+

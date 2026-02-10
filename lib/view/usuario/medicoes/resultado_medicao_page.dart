@@ -1,98 +1,203 @@
-import 'package:app_compactmeter/components/delete_button.dart';
-import 'package:app_compactmeter/service/medicao_service.dart';
-import 'package:flutter/material.dart';
-import '../../../models/medicao_model.dart';
-import '../../../models/veiculo_model.dart';
-import '../../../service/veiculo_service.dart';
-import '../../../theme/app_colors.dart';
-import '../../../components/app_button.dart';
+import 'dart:io';
 
-class ResultadoMedicaoPage extends StatefulWidget {
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:printing/printing.dart';
+import 'package:pdf/widgets.dart' as pw;
+
+import '../../../models/medicao_model.dart';
+
+class ResultadoMedicaoPage extends StatelessWidget {
   final MedicaoModel medicao;
 
-  const ResultadoMedicaoPage({super.key, required this.medicao});
-
-  @override
-  State<ResultadoMedicaoPage> createState() => _ResultadoMedicaoPageState();
-}
-
-class _ResultadoMedicaoPageState extends State<ResultadoMedicaoPage> {
-  VeiculoModel? _veiculo;
-  bool _carregando = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _carregarVeiculo();
-  }
-
-  Future<void> _carregarVeiculo() async {
-    final veiculo =
-        await VeiculoService().buscarPorId(widget.medicao.veiculoId);
-
-    setState(() {
-      _veiculo = veiculo;
-      _carregando = false;
-    });
-  }
-
-  Future<void> _excluirMedicao() async {
-    await MedicaoService().excluirMedicao(widget.medicao.id);
-
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Medição excluída com sucesso')),
-    );
-
-    Navigator.popUntil(context, (route) => route.isFirst);
-  }
+  const ResultadoMedicaoPage({
+    super.key,
+    required this.medicao,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final dataFormatada =
+        DateFormat('dd/MM/yyyy HH:mm').format(medicao.data);
+
     return Scaffold(
-      backgroundColor: AppColors.fundo,
       appBar: AppBar(
         title: const Text('Resultado da Medição'),
-        backgroundColor: AppColors.azul,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.picture_as_pdf),
+            tooltip: 'Gerar PDF',
+            onPressed: () => gerarPdf(context, medicao),
+          ),
+          IconButton(
+            icon: const Icon(Icons.table_chart),
+            tooltip: 'Gerar CSV',
+            onPressed: () => gerarCsv(context, medicao),
+          ),
+        ],
       ),
-      body: _carregando
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(24),
-              child: ListView(
-                children: [
-                  Text(
-                    widget.medicao.nome,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 16),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: ListView(
+          children: [
+            _cardResultado(),
+            const SizedBox(height: 16),
+            _cardDetalhes(dataFormatada),
+            const SizedBox(height: 24),
+            _botaoVoltar(context),
+          ],
+        ),
+      ),
+    );
+  }
 
-                  Text('Veículo: ${_veiculo?.nome ?? '-'}'),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Patinagem: ${widget.medicao.patinagem.toStringAsFixed(2)} %',
-                    style: TextStyle(
-                      color: AppColors.verde,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  DeleteButton(
-                    mensagem: 'Deseja excluir esta medição?',
-                    onConfirm: _excluirMedicao,
-                  ),
-                  const SizedBox(height: 24),
-                  AppButton(
-                    texto: 'Voltar para Home',
-                    onPressed: () {
-                      Navigator.popUntil(context, (route) => route.isFirst);
-                    },
-                  ),
-                ],
+  Widget _cardResultado() {
+    return Card(
+      elevation: 4,
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          children: [
+            const Text(
+              'Patinagem',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              '${medicao.patinagem.toStringAsFixed(2)} %',
+              style: TextStyle(
+                fontSize: 36,
+                fontWeight: FontWeight.bold,
+                color: medicao.patinagem > 20
+                    ? Colors.red
+                    : Colors.green,
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _cardDetalhes(String dataFormatada) {
+    return Card(
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _linha('Nome', medicao.nome),
+            _linha('Data', dataFormatada),
+            _linha('Raio do eixo (m)',
+                medicao.raioEixo.toStringAsFixed(2)),
+            _linha('Distância (m)',
+                medicao.distancia.toStringAsFixed(2)),
+            _linha('Voltas', medicao.voltas.toString()),
+            _linha('Perímetro (m)',
+                medicao.perimetro.toStringAsFixed(2)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _linha(String titulo, String valor) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(titulo, style: const TextStyle(fontWeight: FontWeight.w600)),
+          Text(valor),
+        ],
+      ),
+    );
+  }
+
+  Widget _botaoVoltar(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () => Navigator.pop(context),
+      child: const Text('Voltar'),
+    );
+  }
+
+  static Future<void> gerarPdf(
+    BuildContext context,
+    MedicaoModel medicao,
+  ) async {
+    final pdf = pw.Document();
+    final data =
+        DateFormat('dd/MM/yyyy HH:mm').format(medicao.data);
+
+    pdf.addPage(
+      pw.Page(
+        build: (_) => pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Text(
+              'Resultado da Medição',
+              style: pw.TextStyle(
+                fontSize: 20,
+                fontWeight: pw.FontWeight.bold,
+              ),
+            ),
+            pw.SizedBox(height: 16),
+            pw.Text('Nome: ${medicao.nome}'),
+            pw.Text('Data: $data'),
+            pw.Text(
+                'Patinagem: ${medicao.patinagem.toStringAsFixed(2)} %'),
+            pw.Text(
+                'Distância: ${medicao.distancia.toStringAsFixed(2)} m'),
+            pw.Text('Voltas: ${medicao.voltas}'),
+            pw.Text(
+                'Raio do eixo: ${medicao.raioEixo.toStringAsFixed(2)} m'),
+            pw.Text(
+                'Perímetro: ${medicao.perimetro.toStringAsFixed(2)} m'),
+          ],
+        ),
+      ),
+    );
+
+    await Printing.layoutPdf(
+      onLayout: (format) async => pdf.save(),
+    );
+  }
+
+  static Future<void> gerarCsv(
+    BuildContext context,
+    MedicaoModel medicao,
+  ) async {
+    final data =
+        DateFormat('dd/MM/yyyy HH:mm').format(medicao.data);
+
+    final csv = StringBuffer()
+      ..writeln('Campo,Valor')
+      ..writeln('Nome,${medicao.nome}')
+      ..writeln('Data,$data')
+      ..writeln(
+          'Patinagem,${medicao.patinagem.toStringAsFixed(2)}')
+      ..writeln(
+          'Distância,${medicao.distancia.toStringAsFixed(2)}')
+      ..writeln('Voltas,${medicao.voltas}')
+      ..writeln(
+          'Raio do eixo,${medicao.raioEixo.toStringAsFixed(2)}')
+      ..writeln(
+          'Perímetro,${medicao.perimetro.toStringAsFixed(2)}');
+
+    final dir = await getApplicationDocumentsDirectory();
+    final file = File(
+      '${dir.path}/medicao_${medicao.id}.csv',
+    );
+
+    await file.writeAsString(csv.toString());
+
+    await Printing.sharePdf(
+      bytes: file.readAsBytesSync(),
+      filename: 'medicao_${medicao.id}.csv',
     );
   }
 }
+
+

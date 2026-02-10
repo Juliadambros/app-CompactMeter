@@ -1,4 +1,3 @@
-import 'package:app_compactmeter/components/delete_button.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -6,6 +5,7 @@ import '../../../models/veiculo_model.dart';
 import '../../../service/veiculo_service.dart';
 import '../../../theme/app_colors.dart';
 import '../../../components/loading.dart';
+import '../../../components/delete_button.dart';
 import 'cadastro_veiculo_page.dart';
 
 class ListaVeiculosPage extends StatefulWidget {
@@ -29,14 +29,16 @@ class _ListaVeiculosPageState extends State<ListaVeiculosPage> {
     _futureVeiculos = VeiculoService().listarVeiculosPorUsuario(uid);
   }
 
-  Future<void> _abrirCadastro() async {
+  Future<void> _abrirCadastro({VeiculoModel? veiculo}) async {
     final atualizado = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const CadastroVeiculoPage()),
+      MaterialPageRoute(
+        builder: (_) => CadastroVeiculoPage(veiculo: veiculo),
+      ),
     );
 
     if (atualizado == true) {
-      setState(() => _carregarVeiculos());
+      setState(_carregarVeiculos);
     }
   }
 
@@ -45,10 +47,10 @@ class _ListaVeiculosPageState extends State<ListaVeiculosPage> {
 
     if (!mounted) return;
 
-    setState(() => _carregarVeiculos());
+    setState(_carregarVeiculos);
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Veículo excluído com sucesso')),
+      const SnackBar(content: Text('Máquina excluída com sucesso')),
     );
   }
 
@@ -57,12 +59,12 @@ class _ListaVeiculosPageState extends State<ListaVeiculosPage> {
     return Scaffold(
       backgroundColor: AppColors.fundo,
       appBar: AppBar(
-        title: const Text('Veículos'),
+        title: const Text('Máquinas'),
         backgroundColor: AppColors.azul,
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.verde,
-        onPressed: _abrirCadastro,
+        onPressed: () => _abrirCadastro(),
         child: const Icon(Icons.add),
       ),
       body: FutureBuilder<List<VeiculoModel>>(
@@ -73,7 +75,7 @@ class _ListaVeiculosPageState extends State<ListaVeiculosPage> {
           }
 
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('Nenhum veículo cadastrado'));
+            return const Center(child: Text('Nenhuma máquina cadastrada'));
           }
 
           final veiculos = snapshot.data!;
@@ -84,6 +86,9 @@ class _ListaVeiculosPageState extends State<ListaVeiculosPage> {
             itemBuilder: (context, index) {
               final veiculo = veiculos[index];
 
+              final sensoresAtivos =
+                  veiculo.rodas.where((r) => r.temSensor).length;
+
               return Card(
                 margin: const EdgeInsets.only(bottom: 12),
                 shape: RoundedRectangleBorder(
@@ -91,21 +96,32 @@ class _ListaVeiculosPageState extends State<ListaVeiculosPage> {
                 ),
                 elevation: 3,
                 child: ListTile(
-                  leading: Icon(Icons.agriculture, color: AppColors.verde),
+                  leading: Icon(
+                    Icons.agriculture,
+                    color: AppColors.verde,
+                  ),
                   title: Text(veiculo.nome),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Tipo: ${veiculo.tipo}'),
-                      Text(
-                        'Circunferência: ${veiculo.circunferenciaRoda.toStringAsFixed(2)} m',
-                      ),
+                      Text('Sensores ativos: $sensoresAtivos'),
                     ],
                   ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit),
+                        tooltip: 'Editar',
+                        onPressed: () => _abrirCadastro(veiculo: veiculo),
+                      ),
 
-                  trailing: DeleteButton(
-                    mensagem: 'Deseja excluir este veículo?',
-                    onConfirm: () => _excluirVeiculo(veiculo.id),
+                      DeleteButton(
+                        mensagem: 'Deseja excluir esta máquina?',
+                        onConfirm: () => _excluirVeiculo(veiculo.id),
+                      ),
+                    ],
                   ),
                 ),
               );

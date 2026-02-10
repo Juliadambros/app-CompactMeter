@@ -23,8 +23,7 @@ class DetalhesUsuarioPage extends StatelessWidget {
     final medicaoService = MedicaoService();
 
     try {
-      final medicoes =
-          await medicaoService.listarPorUsuario(usuario.uid);
+      final medicoes = await medicaoService.listarPorUsuario(usuario.uid);
       for (final m in medicoes) {
         await medicaoService.excluirMedicao(m.id);
       }
@@ -40,16 +39,12 @@ class DetalhesUsuarioPage extends StatelessWidget {
       if (context.mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Usuário excluído com sucesso'),
-          ),
+          const SnackBar(content: Text('Usuário excluído com sucesso')),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erro ao excluir usuário: $e'),
-        ),
+        SnackBar(content: Text('Erro ao excluir usuário: $e')),
       );
     }
   }
@@ -68,6 +63,7 @@ class DetalhesUsuarioPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          
           Card(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -82,7 +78,7 @@ class DetalhesUsuarioPage extends StatelessWidget {
           const SizedBox(height: 24),
 
           const Text(
-            'Veículos cadastrados',
+            'Máquinas cadastradas',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
@@ -100,19 +96,56 @@ class DetalhesUsuarioPage extends StatelessWidget {
               final veiculos = snapshot.data ?? [];
 
               if (veiculos.isEmpty) {
-                return const Text('Nenhum veículo cadastrado');
+                return const Text('Nenhuma máquinas cadastrado');
               }
 
               return Column(
                 children: veiculos.map((v) {
+                  final rodasComSensor =
+                      v.rodas.where((r) => r.temSensor).toList();
+
                   return Card(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    child: ListTile(
-                      leading: const Icon(Icons.agriculture),
-                      title: Text(v.nome),
-                      subtitle: Text(
-                        'Circunferência da roda: '
-                        '${v.circunferenciaRoda.toStringAsFixed(2)} m',
+                    margin: const EdgeInsets.only(bottom: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.agriculture),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  v.nome,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text('Tipo: ${v.tipo}'),
+
+                          const SizedBox(height: 8),
+                          if (rodasComSensor.isEmpty)
+                            const Text('Nenhum sensor cadastrado'),
+                          if (rodasComSensor.isNotEmpty)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: rodasComSensor.map((r) {
+                                return Text(
+                                  '• ${r.posicao} – '
+                                  '${r.circunferencia?.toStringAsFixed(2)} m',
+                                );
+                              }).toList(),
+                            ),
+                        ],
                       ),
                     ),
                   );
@@ -147,7 +180,6 @@ class DetalhesUsuarioPage extends StatelessWidget {
 
               return Column(
                 children: medicoes.map((m) {
-
                   return Card(
                     margin: const EdgeInsets.only(bottom: 8),
                     shape: RoundedRectangleBorder(
@@ -159,15 +191,8 @@ class DetalhesUsuarioPage extends StatelessWidget {
                         m.nome,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 4),
-                          Text(
-                            'Patinagem: '
-                            '${m.patinagem.toStringAsFixed(2)}%',
-                          ),
-                        ],
+                      subtitle: Text(
+                        'Patinagem: ${m.patinagem.toStringAsFixed(2)}%',
                       ),
                     ),
                   );
@@ -184,7 +209,7 @@ class DetalhesUsuarioPage extends StatelessWidget {
             titulo: 'Excluir usuário',
             mensagem:
                 'Este usuário será removido do sistema.\n'
-                'Todos os veículos e medições também serão excluídos.\n\n'
+                'Todos as máquinas e medições também serão excluídos.\n\n'
                 'Essa ação não pode ser desfeita.',
             onConfirm: () => _excluirUsuario(context),
           ),

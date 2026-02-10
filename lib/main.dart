@@ -1,3 +1,5 @@
+import 'package:flutter_localizations/flutter_localizations.dart';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -7,6 +9,7 @@ import 'view/login/cadastro_page.dart';
 import 'view/admin/home_admin.dart';
 import 'view/usuario/home_usuario.dart';
 import 'theme/app_colors.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +27,19 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'CompactMeter',
+
+      locale: const Locale('pt', 'BR'),
+
+      supportedLocales: const [
+        Locale('pt', 'BR'),
+        Locale('en', 'US'),
+      ],
+
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
 
       theme: ThemeData(
         useMaterial3: true,
@@ -64,7 +80,7 @@ class MyApp extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: AppColors.azul, width: 2),
           ),
-          labelStyle: TextStyle(color: Colors.grey[700]),
+          labelStyle: TextStyle(color: Colors.grey),
         ),
       ),
 
@@ -78,6 +94,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 
 
 
