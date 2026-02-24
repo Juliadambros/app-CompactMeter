@@ -12,9 +12,9 @@ class MedicaoModel {
   final String nome;
   final DateTime data;
 
-  final double raioEixo;     
-  final double distancia;    
-  final int voltas;          
+  final double raioEixo;
+  final double distancia;
+  final int voltas;
 
   final double perimetro;
   final double patinagem;
@@ -68,19 +68,46 @@ class MedicaoModel {
   }
 
   factory MedicaoModel.fromMap(Map<String, dynamic> map, String id) {
+    String readString(String key, {String fallback = ''}) {
+      final v = map[key];
+      if (v == null) return fallback;
+      if (v is String) return v;
+      return v.toString();
+    }
+
+    double readDouble(String key, {double fallback = 0.0}) {
+      final v = map[key];
+      if (v == null) return fallback;
+      if (v is num) return v.toDouble();
+      return double.tryParse(v.toString()) ?? fallback;
+    }
+
+    int readInt(String key, {int fallback = 0}) {
+      final v = map[key];
+      if (v == null) return fallback;
+      if (v is num) return v.toInt();
+      return int.tryParse(v.toString()) ?? fallback;
+    }
+
+    DateTime readDate(String key) {
+      final v = map[key];
+      if (v is Timestamp) return v.toDate();
+      return DateTime.now();
+    }
+
     return MedicaoModel(
       id: id,
-      usuarioId: map['usuarioId'],
-      propriedadeId: map['propriedadeId'],
-      veiculoId: map['veiculoId'],
-      rodaId: map['rodaId'],
-      nome: map['nome'],
-      data: (map['data'] as Timestamp).toDate(),
-      raioEixo: (map['raioEixo'] as num).toDouble(),
-      distancia: (map['distancia'] as num).toDouble(),
-      voltas: map['voltas'],
-      perimetro: (map['perimetro'] as num).toDouble(),
-      patinagem: (map['patinagem'] as num).toDouble(),
+      usuarioId: readString('usuarioId', fallback: 'DESCONHECIDO'),
+      propriedadeId: readString('propriedadeId', fallback: ''),
+      veiculoId: readString('veiculoId', fallback: ''),
+      rodaId: readString('rodaId', fallback: ''),
+      nome: readString('nome', fallback: 'Medição sem nome'),
+      data: readDate('data'),
+      raioEixo: readDouble('raioEixo'),
+      distancia: readDouble('distancia'),
+      voltas: readInt('voltas'),
+      perimetro: readDouble('perimetro'),
+      patinagem: readDouble('patinagem'),
     );
   }
 
@@ -100,4 +127,3 @@ class MedicaoModel {
     };
   }
 }
-

@@ -12,7 +12,9 @@ import 'package:app_compactmeter/theme/app_colors.dart';
 class CadastroVeiculoPage extends StatefulWidget {
   final VeiculoModel? veiculo;
 
-  const CadastroVeiculoPage({super.key, this.veiculo});
+  final String? uidAlvo;
+
+  const CadastroVeiculoPage({super.key, this.veiculo, this.uidAlvo});
 
   @override
   State<CadastroVeiculoPage> createState() => _CadastroVeiculoPageState();
@@ -49,6 +51,16 @@ class _CadastroVeiculoPageState extends State<CadastroVeiculoPage> {
     }
   }
 
+  @override
+  void dispose() {
+    _nomeController.dispose();
+    _descricaoController.dispose();
+    for (final c in _circControllers.values) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
   void _preencherDados() {
     final v = widget.veiculo!;
 
@@ -59,8 +71,7 @@ class _CadastroVeiculoPageState extends State<CadastroVeiculoPage> {
     for (final roda in v.rodas) {
       _sensores[roda.posicao] = roda.temSensor;
       if (roda.circunferencia != null) {
-        _circControllers[roda.posicao]!.text =
-            roda.circunferencia!.toString();
+        _circControllers[roda.posicao]!.text = roda.circunferencia!.toString();
       }
     }
   }
@@ -73,8 +84,15 @@ class _CadastroVeiculoPageState extends State<CadastroVeiculoPage> {
       return;
     }
 
-    final usuario = FirebaseAuth.instance.currentUser;
-    if (usuario == null) return;
+    final usuarioAtual = FirebaseAuth.instance.currentUser;
+    final uidDono = widget.uidAlvo ?? usuarioAtual?.uid;
+
+    if (uidDono == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Usuário não autenticado')));
+      return;
+    }
 
     final List<RodaModel> rodas = [];
 
@@ -89,9 +107,7 @@ class _CadastroVeiculoPageState extends State<CadastroVeiculoPage> {
 
         if (circ == null || circ <= 0) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Circunferência inválida na roda $posicao'),
-            ),
+            SnackBar(content: Text('Circunferência inválida na roda $posicao')),
           );
           return;
         }
@@ -109,22 +125,32 @@ class _CadastroVeiculoPageState extends State<CadastroVeiculoPage> {
 
     setState(() => _salvando = true);
 
-    final veiculo = VeiculoModel(
-      id: _editando
-          ? widget.veiculo!.id
-          : FirebaseFirestore.instance.collection('veiculos').doc().id,
-      nome: _nomeController.text.trim(),
-      descricao:
-          _descricaoController.text.trim().isEmpty ? null : _descricaoController.text.trim(),
-      tipo: _tipoSelecionado,
-      usuarioId: usuario.uid,
-      rodas: rodas,
-    );
+    try {
+      final veiculo = VeiculoModel(
+        id: _editando
+            ? widget.veiculo!.id
+            : FirebaseFirestore.instance.collection('veiculos').doc().id,
+        nome: _nomeController.text.trim(),
+        descricao: _descricaoController.text.trim().isEmpty
+            ? null
+            : _descricaoController.text.trim(),
+        tipo: _tipoSelecionado,
+        usuarioId: uidDono,
+        rodas: rodas,
+      );
 
-    await VeiculoService().salvarVeiculo(veiculo);
+      await VeiculoService().salvarVeiculo(veiculo);
 
-    if (!mounted) return;
-    Navigator.pop(context, true);
+      if (!mounted) return;
+      Navigator.pop(context, true);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erro ao salvar veículo: $e')));
+    } finally {
+      if (mounted) setState(() => _salvando = false);
+    }
   }
 
   @override
@@ -138,16 +164,10 @@ class _CadastroVeiculoPageState extends State<CadastroVeiculoPage> {
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
-          AppTextField(
-            controller: _nomeController,
-            label: 'Nome da Máquina*',
-          ),
+          AppTextField(controller: _nomeController, label: 'Nome da Máquina*'),
           const SizedBox(height: 16),
 
-          AppTextField(
-            controller: _descricaoController,
-            label: 'Descrição',
-          ),
+          AppTextField(controller: _descricaoController, label: 'Descrição'),
           const SizedBox(height: 16),
 
           DropdownButtonFormField<String>(
@@ -157,14 +177,23 @@ class _CadastroVeiculoPageState extends State<CadastroVeiculoPage> {
               border: OutlineInputBorder(),
             ),
             items: const [
-              DropdownMenuItem(value: 'Colheitadeira', child: Text('Colheitadeira')),
-              DropdownMenuItem(value: 'Pulverizador', child: Text('Pulverizador')),
+              DropdownMenuItem(
+                value: 'Colheitadeira',
+                child: Text('Colheitadeira'),
+              ),
+              DropdownMenuItem(
+                value: 'Pulverizador',
+                child: Text('Pulverizador'),
+              ),
               DropdownMenuItem(value: 'Semeadora', child: Text('Semeadora')),
-              DropdownMenuItem(value: 'Plantadeira', child: Text('Plantadeira')),
+              DropdownMenuItem(
+                value: 'Plantadeira',
+                child: Text('Plantadeira'),
+              ),
               DropdownMenuItem(value: 'Trator', child: Text('Trator')),
               DropdownMenuItem(value: 'Outros', child: Text('Outros')),
             ],
-            onChanged: (v) => setState(() => _tipoSelecionado = v!),
+            onChanged: (v) => setState(() => _tipoSelecionado = v ?? 'Trator'),
           ),
 
           const SizedBox(height: 24),
@@ -212,4 +241,3 @@ class _CadastroVeiculoPageState extends State<CadastroVeiculoPage> {
     );
   }
 }
-

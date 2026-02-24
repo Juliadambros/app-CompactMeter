@@ -24,18 +24,31 @@ class UsuarioService {
   }
 
   Stream<List<UsuarioModel>> streamUsuarios() {
-    return usuarios.snapshots().map(
-      (snapshot) {
-        return snapshot.docs
-            .map(
-              (d) => UsuarioModel.fromMap(d.data() as Map<String, dynamic>),
-            )
-            .toList();
-      },
-    );
+    return usuarios.snapshots().map((snapshot) {
+      return snapshot.docs
+          .map((d) => UsuarioModel.fromMap(d.data() as Map<String, dynamic>))
+          .toList();
+    });
   }
 
   Future<void> excluirUsuario(String uid) async {
     await usuarios.doc(uid).delete();
+  }
+
+  Future<void> atualizarUsuario(
+    String uid, {
+    String? nome,
+    String? email,
+    String? tipoUsuario,
+  }) async {
+    final Map<String, dynamic> data = {};
+
+    if (nome != null) data['nome'] = nome;
+    if (email != null) data['email'] = email;
+    if (tipoUsuario != null) data['tipoUsuario'] = tipoUsuario;
+
+    if (data.isEmpty) return;
+
+    await usuarios.doc(uid).update(data);
   }
 }

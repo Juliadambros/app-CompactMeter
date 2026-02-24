@@ -2,8 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/medicao_model.dart';
 
 class MedicaoService {
-  final CollectionReference _collection =
-      FirebaseFirestore.instance.collection('medicoes');
+  final CollectionReference _collection = FirebaseFirestore.instance.collection(
+    'medicoes',
+  );
 
   Future<void> salvarMedicao(MedicaoModel medicao) async {
     await _collection.doc(medicao.id).set(medicao.toMap());
@@ -14,27 +15,21 @@ class MedicaoService {
 
     if (!doc.exists) return null;
 
-    return MedicaoModel.fromMap(
-      doc.data() as Map<String, dynamic>,
-      doc.id,
-    );
+    return MedicaoModel.fromMap(doc.data() as Map<String, dynamic>, doc.id);
   }
 
   Future<List<MedicaoModel>> listarPorUsuario(String usuarioId) async {
-  final query = await _collection
-      .where('usuarioId', isEqualTo: usuarioId)
-      .get();
+    final query = await _collection
+        .where('usuarioId', isEqualTo: usuarioId)
+        .get();
 
-  return query.docs
-      .map(
-        (doc) => MedicaoModel.fromMap(
-          doc.data() as Map<String, dynamic>,
-          doc.id,
-        ),
-      )
-      .toList();
-}
-
+    return query.docs
+        .map(
+          (doc) =>
+              MedicaoModel.fromMap(doc.data() as Map<String, dynamic>, doc.id),
+        )
+        .toList();
+  }
 
   Future<List<MedicaoModel>> listarPorPropriedade(String propriedadeId) async {
     final query = await _collection
@@ -44,15 +39,31 @@ class MedicaoService {
 
     return query.docs
         .map(
-          (doc) => MedicaoModel.fromMap(
-            doc.data() as Map<String, dynamic>,
-            doc.id,
-          ),
+          (doc) =>
+              MedicaoModel.fromMap(doc.data() as Map<String, dynamic>, doc.id),
         )
         .toList();
   }
 
   Future<void> excluirMedicao(String id) async {
     await _collection.doc(id).delete();
+  }
+
+  Future<List<MedicaoModel>> listarTodas() async {
+    final query = await _collection.orderBy('data', descending: true).get();
+
+    final List<MedicaoModel> out = [];
+
+    for (final doc in query.docs) {
+      try {
+        out.add(
+          MedicaoModel.fromMap(doc.data() as Map<String, dynamic>, doc.id),
+        );
+      } catch (_) {
+        //ignorar medições inválidas
+      }
+    }
+
+    return out;
   }
 }

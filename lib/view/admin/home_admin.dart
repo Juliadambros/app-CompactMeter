@@ -1,3 +1,4 @@
+import 'package:app_compactmeter/service/relatorio_service.dart';
 import 'package:flutter/material.dart';
 import '../../components/action_card.dart';
 import '../../service/auth_service.dart';
@@ -34,10 +35,7 @@ class HomeAdmin extends StatelessWidget {
           children: [
             const Text(
               'Bem-vindo(a), Administrador',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 24),
 
@@ -59,6 +57,45 @@ class HomeAdmin extends StatelessWidget {
                     );
                   },
                 ),
+                ActionCard(
+                  icon: Icons.summarize,
+                  titulo: 'Relatórios (Geral)',
+                  onTap: () async {
+                    final relatorio = RelatorioService();
+
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (_) => SafeArea(
+                        child: Wrap(
+                          children: [
+                            ListTile(
+                              leading: const Icon(Icons.picture_as_pdf),
+                              title: const Text(
+                                'Exportar PDF (todas as medições)',
+                              ),
+                              onTap: () async {
+                                Navigator.pop(context);
+                                await relatorio.compartilharPdfMedicoesGeral();
+                              },
+                            ),
+                            ListTile(
+                              leading: const Icon(Icons.table_chart),
+                              title: const Text(
+                                'Exportar CSV (todas as medições)',
+                              ),
+                              onTap: () async {
+                                Navigator.pop(context);
+                                final file = await relatorio
+                                    .gerarCsvMedicoesGeral();
+                                await relatorio.compartilharArquivo(file);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ],
             ),
           ],
@@ -67,5 +104,3 @@ class HomeAdmin extends StatelessWidget {
     );
   }
 }
-
-

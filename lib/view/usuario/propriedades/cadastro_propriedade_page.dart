@@ -7,9 +7,10 @@ import '../../../service/propriedade_service.dart';
 import '../../../theme/app_colors.dart';
 
 class CadastroPropriedadePage extends StatefulWidget {
-  const CadastroPropriedadePage({super.key, this.propriedade});
+  const CadastroPropriedadePage({super.key, this.propriedade, this.uidAlvo});
 
   final PropriedadeModel? propriedade;
+  final String? uidAlvo;
 
   @override
   State<CadastroPropriedadePage> createState() =>
@@ -38,13 +39,13 @@ class _CadastroPropriedadePageState extends State<CadastroPropriedadePage> {
     if (nomeCtrl.text.trim().isEmpty ||
         donoCtrl.text.trim().isEmpty ||
         enderecoCtrl.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Preencha todos os campos')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Preencha todos os campos')));
       return;
     }
 
-    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final uid = widget.uidAlvo ?? FirebaseAuth.instance.currentUser!.uid;
 
     final propriedade = PropriedadeModel(
       id: widget.propriedade?.id ?? const Uuid().v4(),
@@ -80,8 +81,9 @@ class _CadastroPropriedadePageState extends State<CadastroPropriedadePage> {
           children: [
             TextField(
               controller: nomeCtrl,
-              decoration:
-                  const InputDecoration(labelText: 'Nome da propriedade *'),
+              decoration: const InputDecoration(
+                labelText: 'Nome da propriedade *',
+              ),
             ),
             const SizedBox(height: 12),
 
@@ -106,9 +108,7 @@ class _CadastroPropriedadePageState extends State<CadastroPropriedadePage> {
             const SizedBox(height: 24),
 
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.verde,
-              ),
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.verde),
               onPressed: salvar,
               child: const Text('Salvar'),
             ),
