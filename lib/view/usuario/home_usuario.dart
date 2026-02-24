@@ -1,5 +1,4 @@
 import 'package:app_compactmeter/view/usuario/historico/historico_page.dart';
-import 'package:app_compactmeter/view/usuario/informacoes/como_funciona_page.dart';
 import 'package:app_compactmeter/view/usuario/medicoes/nova_medicao_page.dart';
 import 'package:app_compactmeter/view/usuario/propriedades/lista_propriedades_page.dart';
 import 'package:app_compactmeter/view/usuario/sobre/sobre_page.dart';
@@ -128,21 +127,7 @@ class HomeUsuario extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => const ComoFuncionaPage(),
-                  ),
-                );
-              },
-            ),
-
-            _CardFuncionalidade(
-              icon: Icons.groups_outlined,
-              titulo: 'Sobre Nós',
-              descricao: 'Informações sobre o CompactMeter',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const SobrePage(),
+                    builder: (_) => const  SobreProjetoPage(),
                   ),
                 );
               },
