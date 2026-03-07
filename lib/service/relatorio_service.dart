@@ -7,16 +7,18 @@ import 'package:pdf/widgets.dart' as pw;
 
 import '../models/medicao_model.dart';
 import 'medicao_service.dart';
+import 'calibragem_ponto_service.dart';
 
 class RelatorioService {
   final MedicaoService _medicaoService = MedicaoService();
+  final CalibragemPontoService _pontoService = CalibragemPontoService();
 
   Future<File> gerarCsvMedicoesUsuario(String uid) async {
     final medicoes = await _medicaoService.listarPorUsuario(uid);
 
     final csv = StringBuffer()
       ..writeln(
-        'id,nome,data,patinagem,distancia,voltas,perimetro,usuarioId,propriedadeId,veiculoId,rodaId',
+        'id,nome,data,patinagem,distancia,voltas,perimetro,usuarioId,propriedadeId,veiculoId,rodaId,coordenadaInicialX,coordenadaInicialY,coordenadaFinalX,coordenadaFinalY,altitudeInicial,altitudeFinal',
       );
 
     for (final m in medicoes) {
@@ -32,7 +34,13 @@ class RelatorioService {
         '${m.usuarioId},'
         '${m.propriedadeId},'
         '${m.veiculoId},'
-        '${m.rodaId}',
+        '${m.rodaId},'
+        '${m.coordenadaInicialX ?? ''},'
+        '${m.coordenadaInicialY ?? ''},'
+        '${m.coordenadaFinalX ?? ''},'
+        '${m.coordenadaFinalY ?? ''},'
+        '${m.altitudeInicial ?? ''},'
+        '${m.altitudeFinal ?? ''}',
       );
     }
 
@@ -47,7 +55,7 @@ class RelatorioService {
 
     final csv = StringBuffer()
       ..writeln(
-        'id,nome,data,patinagem,distancia,voltas,perimetro,usuarioId,propriedadeId,veiculoId,rodaId',
+        'id,nome,data,patinagem,distancia,voltas,perimetro,usuarioId,propriedadeId,veiculoId,rodaId,coordenadaInicialX,coordenadaInicialY,coordenadaFinalX,coordenadaFinalY,altitudeInicial,altitudeFinal',
       );
 
     for (final m in medicoes) {
@@ -63,12 +71,50 @@ class RelatorioService {
         '${m.usuarioId},'
         '${m.propriedadeId},'
         '${m.veiculoId},'
-        '${m.rodaId}',
+        '${m.rodaId},'
+        '${m.coordenadaInicialX ?? ''},'
+        '${m.coordenadaInicialY ?? ''},'
+        '${m.coordenadaFinalX ?? ''},'
+        '${m.coordenadaFinalY ?? ''},'
+        '${m.altitudeInicial ?? ''},'
+        '${m.altitudeFinal ?? ''}',
       );
     }
 
     final dir = await getApplicationDocumentsDirectory();
     final file = File('${dir.path}/calibragens_geral.csv');
+    await file.writeAsString(csv.toString(), flush: true);
+    return file;
+  }
+
+  Future<File> gerarCsvPontosMedicao(String medicaoId) async {
+    final pontos = await _pontoService.listarPorMedicao(medicaoId);
+
+    final csv = StringBuffer()
+      ..writeln(
+        'distancia,numeroVoltas,coordenadaX,coordenadaY,altitude,patinagem,indiceCompactacao,coordenadaInicialX,coordenadaInicialY,coordenadaFinalX,coordenadaFinalY,data',
+      );
+
+    for (final p in pontos) {
+      final data = DateFormat('yyyy-MM-dd HH:mm:ss').format(p.data);
+      csv.writeln(
+        '${p.distancia.toStringAsFixed(2)},'
+        '${p.numeroVoltas},'
+        '${p.coordenadaX.toStringAsFixed(6)},'
+        '${p.coordenadaY.toStringAsFixed(6)},'
+        '${p.altitude.toStringAsFixed(2)},'
+        '${p.patinagem.toStringAsFixed(2)},'
+        '${p.indiceCompactacao ?? ''},'
+        '${p.coordenadaInicialX ?? ''},'
+        '${p.coordenadaInicialY ?? ''},'
+        '${p.coordenadaFinalX ?? ''},'
+        '${p.coordenadaFinalY ?? ''},'
+        '$data',
+      );
+    }
+
+    final dir = await getApplicationDocumentsDirectory();
+    final file = File('${dir.path}/pontos_calibragem_$medicaoId.csv');
     await file.writeAsString(csv.toString(), flush: true);
     return file;
   }
@@ -128,9 +174,15 @@ class RelatorioService {
               'Distância (m)',
               'Voltas',
               'Perímetro (m)',
-              'Usuário',
+              'Coord. Inicial',
+              'Coord. Final',
             ],
             data: medicoes.map((m) {
+              final coordInicial =
+                  '${m.coordenadaInicialY?.toStringAsFixed(6) ?? '—'}, ${m.coordenadaInicialX?.toStringAsFixed(6) ?? '—'}';
+              final coordFinal =
+                  '${m.coordenadaFinalY?.toStringAsFixed(6) ?? '—'}, ${m.coordenadaFinalX?.toStringAsFixed(6) ?? '—'}';
+
               return [
                 DateFormat('dd/MM/yyyy HH:mm').format(m.data),
                 m.nome,
@@ -138,7 +190,8 @@ class RelatorioService {
                 m.distancia.toStringAsFixed(2),
                 m.voltas.toString(),
                 m.perimetro.toStringAsFixed(2),
-                m.usuarioId,
+                coordInicial,
+                coordFinal,
               ];
             }).toList(),
             headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),

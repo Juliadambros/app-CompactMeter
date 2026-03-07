@@ -212,8 +212,8 @@ class _CadastroVeiculoPageState extends State<CadastroVeiculoPage> {
             ),
             items: const [
               DropdownMenuItem(
-                value: 'Colheitadeira',
-                child: Text('Colheitadeira'),
+                value: 'Colhedora',
+                child: Text('Colhedora'),
               ),
               DropdownMenuItem(
                 value: 'Pulverizador',
@@ -224,8 +224,8 @@ class _CadastroVeiculoPageState extends State<CadastroVeiculoPage> {
                 child: Text('Semeadora'),
               ),
               DropdownMenuItem(
-                value: 'Plantadeira',
-                child: Text('Plantadeira'),
+                value: 'Plantadora',
+                child: Text('Plantadora'),
               ),
               DropdownMenuItem(
                 value: 'Trator',

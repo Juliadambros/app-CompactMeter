@@ -15,13 +15,9 @@ class SobreProjetoPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             const Text(
               "CompactMeter",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 12),
@@ -43,16 +39,22 @@ class SobreProjetoPage extends StatelessWidget {
 
             const Text(
               "Fórmulas Matemáticas Utilizadas",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 10),
 
             const Text(
-              "As fórmulas matemáticas utilizadas no CompactMeter serão descritas nesta seção. ",
+              "As fórmulas matemáticas utilizadas no CompactMeter são responsáveis por calcular o índice de patinagem das rodas da máquina agrícola. "
+              "A patinagem ocorre quando a roda gira mais do que o deslocamento real da máquina no solo, indicando perda de tração.\n\n"
+              "O cálculo é realizado comparando o avanço real da máquina com o avanço teórico da roda. "
+              "O avanço real é obtido dividindo a distância percorrida pelo número de voltas detectadas pelo sensor. "
+              "O avanço teórico corresponde à circunferência da roda cadastrada no sistema.\n\n"
+              "A fórmula utilizada é:\n\n"
+              "Patinagem (%) = 100 - [((distância percorrida / número de voltas) × 100) / circunferência da roda]\n\n"
+              "Se o avanço real por volta for igual à circunferência da roda, significa que não houve patinagem. "
+              "Quando o valor calculado aumenta, indica que a roda está girando mais do que o deslocamento da máquina, "
+              "caracterizando patinagem no solo.",
               style: TextStyle(fontSize: 16),
               textAlign: TextAlign.justify,
             ),
@@ -61,10 +63,7 @@ class SobreProjetoPage extends StatelessWidget {
 
             const Text(
               "Equipe do Projeto",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 10),
@@ -79,10 +78,7 @@ class SobreProjetoPage extends StatelessWidget {
 
             const Text(
               "Professores / Pesquisadores",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 10),
@@ -98,10 +94,7 @@ class SobreProjetoPage extends StatelessWidget {
 
             const Text(
               "Instituições e Departamentos",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 15),
@@ -112,7 +105,7 @@ class SobreProjetoPage extends StatelessWidget {
               runSpacing: 20,
               children: [
                 _buildLogo("assets/imgs/agronomia.png"),
-                _buildLogo("assets/imgs/logobigdata.png"),
+                _buildLogo('assets/imgs/logoBigDataCor.png'),
                 _buildLogo("assets/imgs/logo_CienciaComputacao.png"),
                 _buildLogo("assets/imgs/nmap.png"),
                 _buildLogo("assets/imgs/unicentro.png"),
@@ -127,12 +120,6 @@ class SobreProjetoPage extends StatelessWidget {
   }
 
   Widget _buildLogo(String path) {
-    return SizedBox(
-      width: 100,
-      child: Image.asset(
-        path,
-        fit: BoxFit.contain,
-      ),
-    );
+    return SizedBox(width: 100, child: Image.asset(path, fit: BoxFit.contain));
   }
 }

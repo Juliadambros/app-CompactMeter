@@ -219,7 +219,7 @@ class _CadastroPageState extends State<CadastroPage> {
                         height: 40,
                       ),
                       const SizedBox(width: 16),
-                      Image.asset('assets/imgs/logobigdata.png', height: 30),
+                      Image.asset('assets/imgs/logoBigDataCor.png', height: 40),
                       const SizedBox(width: 16),
                       Image.asset('assets/imgs/agronomia.png', height: 40),
                     ],

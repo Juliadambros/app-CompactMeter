@@ -11,10 +11,7 @@ import '../../../models/medicao_model.dart';
 class ResultadoMedicaoPage extends StatelessWidget {
   final MedicaoModel medicao;
 
-  const ResultadoMedicaoPage({
-    super.key,
-    required this.medicao,
-  });
+  const ResultadoMedicaoPage({super.key, required this.medicao});
 
   @override
   Widget build(BuildContext context) {
@@ -89,8 +86,36 @@ class ResultadoMedicaoPage extends StatelessWidget {
             _linha('Data', dataFormatada),
             _linha('Distância (m)', medicao.distancia.toStringAsFixed(2)),
             _linha('Voltas', medicao.voltas.toString()),
-            _linha('Perímetro / Circunferência (m)', medicao.perimetro.toStringAsFixed(2)),
+            _linha(
+              'Perímetro / Circunferência (m)',
+              medicao.perimetro.toStringAsFixed(2),
+            ),
             _linha('Patinagem (%)', medicao.patinagem.toStringAsFixed(2)),
+            const Divider(height: 20),
+            _linha(
+              'Coordenada inicial X',
+              medicao.coordenadaInicialX?.toStringAsFixed(6) ?? '—',
+            ),
+            _linha(
+              'Coordenada inicial Y',
+              medicao.coordenadaInicialY?.toStringAsFixed(6) ?? '—',
+            ),
+            _linha(
+              'Coordenada final X',
+              medicao.coordenadaFinalX?.toStringAsFixed(6) ?? '—',
+            ),
+            _linha(
+              'Coordenada final Y',
+              medicao.coordenadaFinalY?.toStringAsFixed(6) ?? '—',
+            ),
+            _linha(
+              'Altitude inicial (m)',
+              medicao.altitudeInicial?.toStringAsFixed(2) ?? '—',
+            ),
+            _linha(
+              'Altitude final (m)',
+              medicao.altitudeFinal?.toStringAsFixed(2) ?? '—',
+            ),
           ],
         ),
       ),
@@ -110,7 +135,7 @@ class ResultadoMedicaoPage extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          Text(valor),
+          Expanded(child: Text(valor, textAlign: TextAlign.right)),
         ],
       ),
     );
@@ -137,10 +162,7 @@ class ResultadoMedicaoPage extends StatelessWidget {
           children: [
             pw.Text(
               'Resultado da Calibragem',
-              style: pw.TextStyle(
-                fontSize: 20,
-                fontWeight: pw.FontWeight.bold,
-              ),
+              style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold),
             ),
             pw.SizedBox(height: 16),
             pw.Text('Nome: ${medicao.nome}'),
@@ -148,15 +170,27 @@ class ResultadoMedicaoPage extends StatelessWidget {
             pw.Text('Patinagem: ${medicao.patinagem.toStringAsFixed(2)} %'),
             pw.Text('Distância: ${medicao.distancia.toStringAsFixed(2)} m'),
             pw.Text('Voltas: ${medicao.voltas}'),
-            pw.Text('Perímetro / Circunferência: ${medicao.perimetro.toStringAsFixed(2)} m'),
+            pw.Text(
+              'Perímetro / Circunferência: ${medicao.perimetro.toStringAsFixed(2)} m',
+            ),
+            pw.Text(
+              'Coordenada inicial: ${medicao.coordenadaInicialY?.toStringAsFixed(6) ?? '—'}, ${medicao.coordenadaInicialX?.toStringAsFixed(6) ?? '—'}',
+            ),
+            pw.Text(
+              'Coordenada final: ${medicao.coordenadaFinalY?.toStringAsFixed(6) ?? '—'}, ${medicao.coordenadaFinalX?.toStringAsFixed(6) ?? '—'}',
+            ),
+            pw.Text(
+              'Altitude inicial: ${medicao.altitudeInicial?.toStringAsFixed(2) ?? '—'} m',
+            ),
+            pw.Text(
+              'Altitude final: ${medicao.altitudeFinal?.toStringAsFixed(2) ?? '—'} m',
+            ),
           ],
         ),
       ),
     );
 
-    await Printing.layoutPdf(
-      onLayout: (format) async => pdf.save(),
-    );
+    await Printing.layoutPdf(onLayout: (format) async => pdf.save());
   }
 
   static Future<void> gerarCsv(
@@ -172,7 +206,27 @@ class ResultadoMedicaoPage extends StatelessWidget {
       ..writeln('Patinagem,${medicao.patinagem.toStringAsFixed(2)}')
       ..writeln('Distância,${medicao.distancia.toStringAsFixed(2)}')
       ..writeln('Voltas,${medicao.voltas}')
-      ..writeln('Perímetro/Circunferência,${medicao.perimetro.toStringAsFixed(2)}');
+      ..writeln(
+        'Perímetro/Circunferência,${medicao.perimetro.toStringAsFixed(2)}',
+      )
+      ..writeln(
+        'CoordenadaInicialX,${medicao.coordenadaInicialX?.toStringAsFixed(6) ?? ''}',
+      )
+      ..writeln(
+        'CoordenadaInicialY,${medicao.coordenadaInicialY?.toStringAsFixed(6) ?? ''}',
+      )
+      ..writeln(
+        'CoordenadaFinalX,${medicao.coordenadaFinalX?.toStringAsFixed(6) ?? ''}',
+      )
+      ..writeln(
+        'CoordenadaFinalY,${medicao.coordenadaFinalY?.toStringAsFixed(6) ?? ''}',
+      )
+      ..writeln(
+        'AltitudeInicial,${medicao.altitudeInicial?.toStringAsFixed(2) ?? ''}',
+      )
+      ..writeln(
+        'AltitudeFinal,${medicao.altitudeFinal?.toStringAsFixed(2) ?? ''}',
+      );
 
     final dir = await getApplicationDocumentsDirectory();
     final file = File('${dir.path}/calibragem_${medicao.id}.csv');
@@ -185,8 +239,3 @@ class ResultadoMedicaoPage extends StatelessWidget {
     );
   }
 }
-
-
-
-
-

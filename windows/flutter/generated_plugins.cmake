@@ -9,6 +9,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   firebase_core
   firebase_storage
   flutter_bluetooth_classic_serial
+  geolocator_windows
   permission_handler_windows
   printing
   share_plus

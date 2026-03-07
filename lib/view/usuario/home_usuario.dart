@@ -1,4 +1,6 @@
+import 'package:app_compactmeter/view/usuario/compactacao/nova_medicao_compactacao_page.dart';
 import 'package:app_compactmeter/view/usuario/historico/historico_page.dart';
+import 'package:app_compactmeter/view/usuario/historico/historico_patinagem_page.dart';
 import 'package:app_compactmeter/view/usuario/medicoes/calibrar_patinagem_page.dart';
 import 'package:app_compactmeter/view/usuario/propriedades/lista_propriedades_page.dart';
 import 'package:app_compactmeter/view/usuario/sobre/sobre_page.dart';
@@ -99,7 +101,7 @@ class HomeUsuario extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => const HomeUsuario(),
+                    builder: (_) => const NovaMedicaoCompactacaoPage(),
                   ),
                 );
               },
