@@ -1,5 +1,5 @@
 import 'package:app_compactmeter/view/usuario/historico/historico_page.dart';
-import 'package:app_compactmeter/view/usuario/medicoes/nova_medicao_page.dart';
+import 'package:app_compactmeter/view/usuario/medicoes/calibrar_patinagem_page.dart';
 import 'package:app_compactmeter/view/usuario/propriedades/lista_propriedades_page.dart';
 import 'package:app_compactmeter/view/usuario/sobre/sobre_page.dart';
 import 'package:app_compactmeter/view/usuario/veiculos/lista_veiculos_page.dart';
@@ -79,13 +79,13 @@ class HomeUsuario extends StatelessWidget {
 
             _CardFuncionalidade(
               icon: Icons.calculate,
-              titulo: 'Nova medição de patinagem',
-              descricao: 'Iniciar medição de patinagem',
+              titulo: 'Calibragem da Patinagem',
+              descricao: 'Iniciar calibração da patinagem',
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => const NovaMedicaoPage(),
+                    builder: (_) => const CalibrarPatinagemPage(),
                   ),
                 );
               },

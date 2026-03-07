@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import '../../components/delete_button.dart';
 import '../../models/medicao_model.dart';
 import '../../models/propriedade_model.dart';
@@ -18,7 +19,10 @@ import '../usuario/veiculos/cadastro_veiculo_page.dart';
 class DetalhesUsuarioPage extends StatefulWidget {
   final UsuarioModel usuario;
 
-  const DetalhesUsuarioPage({super.key, required this.usuario});
+  const DetalhesUsuarioPage({
+    super.key,
+    required this.usuario,
+  });
 
   @override
   State<DetalhesUsuarioPage> createState() => _DetalhesUsuarioPageState();
@@ -41,7 +45,6 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // carrega uma vez por tela
     if (!_cacheCarregado) {
       _cacheCarregado = true;
       _carregarCaches();
@@ -51,18 +54,15 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
   Future<void> _carregarCaches() async {
     try {
       final props = await propriedadeService.listarPorUsuario(usuario.uid);
-      final veiculos = await veiculoService.listarVeiculosPorUsuario(
-        usuario.uid,
-      );
+      final veiculos = await veiculoService.listarVeiculosPorUsuario(usuario.uid);
 
       if (!mounted) return;
+
       setState(() {
         _propsById = {for (final p in props) p.id: p};
         _veiculosById = {for (final v in veiculos) v.id: v};
       });
-    } catch (_) {
-      // se falhar
-    }
+    } catch (_) {}
   }
 
   Future<void> _excluirUsuario() async {
@@ -72,16 +72,12 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
         await medicaoService.excluirMedicao(m.id);
       }
 
-      final veiculos = await veiculoService.listarVeiculosPorUsuario(
-        usuario.uid,
-      );
+      final veiculos = await veiculoService.listarVeiculosPorUsuario(usuario.uid);
       for (final v in veiculos) {
         await veiculoService.excluirVeiculo(v.id);
       }
 
-      final propriedades = await propriedadeService.listarPorUsuario(
-        usuario.uid,
-      );
+      final propriedades = await propriedadeService.listarPorUsuario(usuario.uid);
       for (final p in propriedades) {
         await propriedadeService.excluir(p.id);
       }
@@ -95,9 +91,9 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Erro ao excluir usuário: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao excluir usuário: $e')),
+      );
     }
   }
 
@@ -118,6 +114,7 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
     for (final r in v.rodas) {
       if (r.posicao == rodaId) return r.posicao;
     }
+
     return rodaId.isEmpty ? '—' : rodaId;
   }
 
@@ -128,7 +125,7 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 130,
+            width: 145,
             child: Text(
               titulo,
               style: const TextStyle(fontWeight: FontWeight.w600),
@@ -150,18 +147,18 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.picture_as_pdf),
-            tooltip: 'Exportar PDF (medições)',
+            tooltip: 'Exportar PDF (calibragens)',
             onPressed: () async {
               final relatorio = RelatorioService();
               await relatorio.compartilharPdfMedicoesUsuario(
                 usuario.uid,
-                titulo: 'Medições - ${usuario.nome}',
+                titulo: 'Calibragens - ${usuario.nome}',
               );
             },
           ),
           IconButton(
             icon: const Icon(Icons.table_chart),
-            tooltip: 'Exportar CSV (medições)',
+            tooltip: 'Exportar CSV (calibragens)',
             onPressed: () async {
               final relatorio = RelatorioService();
               final file = await relatorio.gerarCsvMedicoesUsuario(usuario.uid);
@@ -180,7 +177,7 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
               );
               if (!mounted) return;
               setState(() {});
-              await _carregarCaches(); 
+              await _carregarCaches();
             },
           ),
         ],
@@ -215,8 +212,7 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
                   await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) =>
-                          CadastroPropriedadePage(uidAlvo: usuario.uid),
+                      builder: (_) => CadastroPropriedadePage(uidAlvo: usuario.uid),
                     ),
                   );
                   if (!mounted) return;
@@ -257,9 +253,7 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
                         p.nome,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      subtitle: Text(
-                        'Dono: ${p.dono}\nEndereço: ${p.endereco}',
-                      ),
+                      subtitle: Text('Dono: ${p.dono}\nEndereço: ${p.endereco}'),
                       isThreeLine: true,
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -347,10 +341,6 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
 
               return Column(
                 children: veiculos.map((v) {
-                  final rodasComSensor = v.rodas
-                      .where((r) => r.temSensor)
-                      .toList();
-
                   return Card(
                     margin: const EdgeInsets.only(bottom: 12),
                     shape: RoundedRectangleBorder(
@@ -412,17 +402,20 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
                               child: Text('Descrição: ${v.descricao}'),
                             ),
                           const SizedBox(height: 8),
-                          if (rodasComSensor.isEmpty)
-                            const Text('Nenhum sensor cadastrado'),
-                          if (rodasComSensor.isNotEmpty)
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: rodasComSensor.map((r) {
-                                return Text(
-                                  '• ${r.posicao} – ${r.circunferencia?.toStringAsFixed(2)} m',
-                                );
-                              }).toList(),
-                            ),
+                          const Text(
+                            'Circunferência das rodas:',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 4),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: v.rodas.map((r) {
+                              final circ = r.circunferencia;
+                              return Text(
+                                '• ${r.posicao} – ${circ != null ? '${circ.toStringAsFixed(2)} m' : 'Não informada'}',
+                              );
+                            }).toList(),
+                          ),
                         ],
                       ),
                     ),
@@ -435,7 +428,7 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
           const SizedBox(height: 24),
 
           const Text(
-            'Medições realizadas',
+            'Calibragens realizadas',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
@@ -453,7 +446,7 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
               final medicoes = snapshot.data ?? [];
 
               if (medicoes.isEmpty) {
-                return const Text('Nenhuma medição realizada');
+                return const Text('Nenhuma calibragem realizada');
               }
 
               return Column(
@@ -485,7 +478,7 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
                               ),
                               IconButton(
                                 icon: const Icon(Icons.delete),
-                                tooltip: 'Excluir medição',
+                                tooltip: 'Excluir calibragem',
                                 onPressed: () async {
                                   await medicaoService.excluirMedicao(m.id);
                                   if (!mounted) return;
@@ -494,32 +487,21 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
                               ),
                             ],
                           ),
-
                           const SizedBox(height: 8),
-
                           _infoLinha('Data', _df.format(m.data)),
                           _infoLinha('Propriedade', propNome),
                           _infoLinha('Máquina', veicNome),
                           _infoLinha('Roda', rodaNome),
-
                           const Divider(height: 20),
-
-                          _infoLinha(
-                            'Raio do eixo',
-                            m.raioEixo.toStringAsFixed(2),
-                          ),
-                          _infoLinha(
-                            'Distância',
-                            '${m.distancia.toStringAsFixed(2)} m',
-                          ),
+                          _infoLinha('Distância', '${m.distancia.toStringAsFixed(2)} m'),
                           _infoLinha('Voltas', m.voltas.toString()),
                           _infoLinha(
-                            'Perímetro',
-                            m.perimetro.toStringAsFixed(2),
+                            'Circunferência da roda',
+                            '${m.perimetro.toStringAsFixed(2)} m',
                           ),
                           _infoLinha(
                             'Patinagem',
-                            '${m.patinagem.toStringAsFixed(2)}%',
+                            '${m.patinagem.toStringAsFixed(2)} %',
                           ),
                         ],
                       ),
@@ -538,7 +520,7 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
             titulo: 'Excluir usuário',
             mensagem:
                 'Este usuário será removido do sistema.\n'
-                'Todas as máquinas, propriedades e medições também serão excluídas.\n\n'
+                'Todas as máquinas, propriedades e calibragens também serão excluídas.\n\n'
                 'Essa ação não pode ser desfeita.',
             onConfirm: _excluirUsuario,
           ),

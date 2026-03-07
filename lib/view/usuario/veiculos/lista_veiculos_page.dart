@@ -54,6 +54,10 @@ class _ListaVeiculosPageState extends State<ListaVeiculosPage> {
     );
   }
 
+  int _rodasComCircunferencia(VeiculoModel veiculo) {
+    return veiculo.rodas.where((r) => r.circunferencia != null && r.circunferencia! > 0).length;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,9 +89,7 @@ class _ListaVeiculosPageState extends State<ListaVeiculosPage> {
             itemCount: veiculos.length,
             itemBuilder: (context, index) {
               final veiculo = veiculos[index];
-
-              final sensoresAtivos =
-                  veiculo.rodas.where((r) => r.temSensor).length;
+              final rodasPreenchidas = _rodasComCircunferencia(veiculo);
 
               return Card(
                 margin: const EdgeInsets.only(bottom: 12),
@@ -105,7 +107,7 @@ class _ListaVeiculosPageState extends State<ListaVeiculosPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Tipo: ${veiculo.tipo}'),
-                      Text('Sensores ativos: $sensoresAtivos'),
+                      Text('Rodas com circunferência cadastrada: $rodasPreenchidas/4'),
                     ],
                   ),
                   trailing: Row(
@@ -116,7 +118,6 @@ class _ListaVeiculosPageState extends State<ListaVeiculosPage> {
                         tooltip: 'Editar',
                         onPressed: () => _abrirCadastro(veiculo: veiculo),
                       ),
-
                       DeleteButton(
                         mensagem: 'Deseja excluir esta máquina?',
                         onConfirm: () => _excluirVeiculo(veiculo.id),

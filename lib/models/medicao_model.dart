@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'dart:math';
 
 class MedicaoModel {
   final String id;
@@ -12,7 +11,6 @@ class MedicaoModel {
   final String nome;
   final DateTime data;
 
-  final double raioEixo;
   final double distancia;
   final int voltas;
 
@@ -27,7 +25,6 @@ class MedicaoModel {
     required this.rodaId,
     required this.nome,
     required this.data,
-    required this.raioEixo,
     required this.distancia,
     required this.voltas,
     required this.perimetro,
@@ -35,37 +32,37 @@ class MedicaoModel {
   });
 
   factory MedicaoModel.criar({
-    required String id,
-    required String usuarioId,
-    required String propriedadeId,
-    required String veiculoId,
-    required String rodaId,
-    required String nome,
-    required double raioEixo,
-    required double distancia,
-    required int voltas,
-  }) {
-    final perimetro = 2 * pi * raioEixo;
+  required String id,
+  required String usuarioId,
+  required String propriedadeId,
+  required String veiculoId,
+  required String rodaId,
+  required String nome,
+  required double circunferencia,
+  required double distancia,
+  required int voltas,
+}) {
 
-    final patinagem = voltas == 0
-        ? 0.0
-        : 100 - (((distancia / voltas) * 100) / perimetro);
+  final perimetro = circunferencia;
 
-    return MedicaoModel(
-      id: id,
-      usuarioId: usuarioId,
-      propriedadeId: propriedadeId,
-      veiculoId: veiculoId,
-      rodaId: rodaId,
-      nome: nome,
-      data: DateTime.now(),
-      raioEixo: raioEixo,
-      distancia: distancia,
-      voltas: voltas,
-      perimetro: perimetro,
-      patinagem: patinagem,
-    );
-  }
+  final patinagem = voltas == 0
+      ? 0.0
+      : 100 - (((distancia / voltas) * 100) / perimetro);
+
+  return MedicaoModel(
+    id: id,
+    usuarioId: usuarioId,
+    propriedadeId: propriedadeId,
+    veiculoId: veiculoId,
+    rodaId: rodaId,
+    nome: nome,
+    data: DateTime.now(),
+    distancia: distancia,
+    voltas: voltas,
+    perimetro: perimetro,
+    patinagem: patinagem,
+  );
+}
 
   factory MedicaoModel.fromMap(Map<String, dynamic> map, String id) {
     String readString(String key, {String fallback = ''}) {
@@ -103,7 +100,6 @@ class MedicaoModel {
       rodaId: readString('rodaId', fallback: ''),
       nome: readString('nome', fallback: 'Medição sem nome'),
       data: readDate('data'),
-      raioEixo: readDouble('raioEixo'),
       distancia: readDouble('distancia'),
       voltas: readInt('voltas'),
       perimetro: readDouble('perimetro'),
@@ -119,7 +115,6 @@ class MedicaoModel {
       'rodaId': rodaId,
       'nome': nome,
       'data': Timestamp.fromDate(data),
-      'raioEixo': raioEixo,
       'distancia': distancia,
       'voltas': voltas,
       'perimetro': perimetro,

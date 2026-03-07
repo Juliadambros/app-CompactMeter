@@ -11,13 +11,12 @@ import 'medicao_service.dart';
 class RelatorioService {
   final MedicaoService _medicaoService = MedicaoService();
 
-
   Future<File> gerarCsvMedicoesUsuario(String uid) async {
     final medicoes = await _medicaoService.listarPorUsuario(uid);
 
     final csv = StringBuffer()
       ..writeln(
-        'id,nome,data,patinagem,distancia,voltas,raioEixo,perimetro,usuarioId',
+        'id,nome,data,patinagem,distancia,voltas,perimetro,usuarioId,propriedadeId,veiculoId,rodaId',
       );
 
     for (final m in medicoes) {
@@ -29,14 +28,16 @@ class RelatorioService {
         '${m.patinagem.toStringAsFixed(2)},'
         '${m.distancia.toStringAsFixed(2)},'
         '${m.voltas},'
-        '${m.raioEixo.toStringAsFixed(2)},'
         '${m.perimetro.toStringAsFixed(2)},'
-        '${m.usuarioId}',
+        '${m.usuarioId},'
+        '${m.propriedadeId},'
+        '${m.veiculoId},'
+        '${m.rodaId}',
       );
     }
 
     final dir = await getApplicationDocumentsDirectory();
-    final file = File('${dir.path}/medicoes_usuario_$uid.csv');
+    final file = File('${dir.path}/calibragens_usuario_$uid.csv');
     await file.writeAsString(csv.toString(), flush: true);
     return file;
   }
@@ -46,7 +47,7 @@ class RelatorioService {
 
     final csv = StringBuffer()
       ..writeln(
-        'id,nome,data,patinagem,distancia,voltas,raioEixo,perimetro,usuarioId',
+        'id,nome,data,patinagem,distancia,voltas,perimetro,usuarioId,propriedadeId,veiculoId,rodaId',
       );
 
     for (final m in medicoes) {
@@ -58,14 +59,16 @@ class RelatorioService {
         '${m.patinagem.toStringAsFixed(2)},'
         '${m.distancia.toStringAsFixed(2)},'
         '${m.voltas},'
-        '${m.raioEixo.toStringAsFixed(2)},'
         '${m.perimetro.toStringAsFixed(2)},'
-        '${m.usuarioId}',
+        '${m.usuarioId},'
+        '${m.propriedadeId},'
+        '${m.veiculoId},'
+        '${m.rodaId}',
       );
     }
 
     final dir = await getApplicationDocumentsDirectory();
-    final file = File('${dir.path}/medicoes_geral.csv');
+    final file = File('${dir.path}/calibragens_geral.csv');
     await file.writeAsString(csv.toString(), flush: true);
     return file;
   }
@@ -76,24 +79,27 @@ class RelatorioService {
   }) async {
     final medicoes = await _medicaoService.listarPorUsuario(uid);
     await _compartilharPdf(
-      titulo: titulo ?? 'Relatório de Medições (Usuário)',
+      titulo: titulo ?? 'Relatório de Calibragens (Usuário)',
       medicoes: medicoes,
-      nomeArquivo: 'medicoes_usuario_$uid.pdf',
+      nomeArquivo: 'calibragens_usuario_$uid.pdf',
     );
   }
 
   Future<void> compartilharPdfMedicoesGeral() async {
     final medicoes = await _medicaoService.listarTodas();
     await _compartilharPdf(
-      titulo: 'Relatório de Medições (Geral)',
+      titulo: 'Relatório de Calibragens (Geral)',
       medicoes: medicoes,
-      nomeArquivo: 'medicoes_geral.pdf',
+      nomeArquivo: 'calibragens_geral.pdf',
     );
   }
 
   Future<void> compartilharArquivo(File file) async {
     final bytes = await file.readAsBytes();
-    await Printing.sharePdf(bytes: bytes, filename: file.path.split('/').last);
+    await Printing.sharePdf(
+      bytes: bytes,
+      filename: file.path.split('/').last,
+    );
   }
 
   Future<void> _compartilharPdf({
@@ -108,17 +114,20 @@ class RelatorioService {
         build: (_) => [
           pw.Text(
             titulo,
-            style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
+            style: pw.TextStyle(
+              fontSize: 18,
+              fontWeight: pw.FontWeight.bold,
+            ),
           ),
           pw.SizedBox(height: 12),
-
           pw.Table.fromTextArray(
             headers: const [
               'Data',
               'Nome',
-              'Patinagem(%)',
-              'Dist(m)',
+              'Patinagem (%)',
+              'Distância (m)',
               'Voltas',
+              'Perímetro (m)',
               'Usuário',
             ],
             data: medicoes.map((m) {
@@ -128,6 +137,7 @@ class RelatorioService {
                 m.patinagem.toStringAsFixed(2),
                 m.distancia.toStringAsFixed(2),
                 m.voltas.toString(),
+                m.perimetro.toStringAsFixed(2),
                 m.usuarioId,
               ];
             }).toList(),
@@ -139,7 +149,10 @@ class RelatorioService {
       ),
     );
 
-    await Printing.sharePdf(bytes: await pdf.save(), filename: nomeArquivo);
+    await Printing.sharePdf(
+      bytes: await pdf.save(),
+      filename: nomeArquivo,
+    );
   }
 
   String _escape(String s) => s.replaceAll('"', '""');

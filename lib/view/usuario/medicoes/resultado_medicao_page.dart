@@ -18,12 +18,11 @@ class ResultadoMedicaoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dataFormatada =
-        DateFormat('dd/MM/yyyy HH:mm').format(medicao.data);
+    final dataFormatada = DateFormat('dd/MM/yyyy HH:mm').format(medicao.data);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Resultado da Medição'),
+        title: const Text('Resultado da Calibragem'),
         actions: [
           IconButton(
             icon: const Icon(Icons.picture_as_pdf),
@@ -60,7 +59,7 @@ class ResultadoMedicaoPage extends StatelessWidget {
         child: Column(
           children: [
             const Text(
-              'Patinagem',
+              'Patinagem calibrada',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
@@ -69,9 +68,7 @@ class ResultadoMedicaoPage extends StatelessWidget {
               style: TextStyle(
                 fontSize: 36,
                 fontWeight: FontWeight.bold,
-                color: medicao.patinagem > 20
-                    ? Colors.red
-                    : Colors.green,
+                color: medicao.patinagem > 20 ? Colors.red : Colors.green,
               ),
             ),
           ],
@@ -90,13 +87,10 @@ class ResultadoMedicaoPage extends StatelessWidget {
           children: [
             _linha('Nome', medicao.nome),
             _linha('Data', dataFormatada),
-            _linha('Raio do eixo (m)',
-                medicao.raioEixo.toStringAsFixed(2)),
-            _linha('Distância (m)',
-                medicao.distancia.toStringAsFixed(2)),
+            _linha('Distância (m)', medicao.distancia.toStringAsFixed(2)),
             _linha('Voltas', medicao.voltas.toString()),
-            _linha('Perímetro (m)',
-                medicao.perimetro.toStringAsFixed(2)),
+            _linha('Perímetro / Circunferência (m)', medicao.perimetro.toStringAsFixed(2)),
+            _linha('Patinagem (%)', medicao.patinagem.toStringAsFixed(2)),
           ],
         ),
       ),
@@ -109,7 +103,13 @@ class ResultadoMedicaoPage extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(titulo, style: const TextStyle(fontWeight: FontWeight.w600)),
+          Expanded(
+            child: Text(
+              titulo,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
+          const SizedBox(width: 12),
           Text(valor),
         ],
       ),
@@ -128,8 +128,7 @@ class ResultadoMedicaoPage extends StatelessWidget {
     MedicaoModel medicao,
   ) async {
     final pdf = pw.Document();
-    final data =
-        DateFormat('dd/MM/yyyy HH:mm').format(medicao.data);
+    final data = DateFormat('dd/MM/yyyy HH:mm').format(medicao.data);
 
     pdf.addPage(
       pw.Page(
@@ -137,7 +136,7 @@ class ResultadoMedicaoPage extends StatelessWidget {
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.Text(
-              'Resultado da Medição',
+              'Resultado da Calibragem',
               style: pw.TextStyle(
                 fontSize: 20,
                 fontWeight: pw.FontWeight.bold,
@@ -146,15 +145,10 @@ class ResultadoMedicaoPage extends StatelessWidget {
             pw.SizedBox(height: 16),
             pw.Text('Nome: ${medicao.nome}'),
             pw.Text('Data: $data'),
-            pw.Text(
-                'Patinagem: ${medicao.patinagem.toStringAsFixed(2)} %'),
-            pw.Text(
-                'Distância: ${medicao.distancia.toStringAsFixed(2)} m'),
+            pw.Text('Patinagem: ${medicao.patinagem.toStringAsFixed(2)} %'),
+            pw.Text('Distância: ${medicao.distancia.toStringAsFixed(2)} m'),
             pw.Text('Voltas: ${medicao.voltas}'),
-            pw.Text(
-                'Raio do eixo: ${medicao.raioEixo.toStringAsFixed(2)} m'),
-            pw.Text(
-                'Perímetro: ${medicao.perimetro.toStringAsFixed(2)} m'),
+            pw.Text('Perímetro / Circunferência: ${medicao.perimetro.toStringAsFixed(2)} m'),
           ],
         ),
       ),
@@ -169,35 +163,30 @@ class ResultadoMedicaoPage extends StatelessWidget {
     BuildContext context,
     MedicaoModel medicao,
   ) async {
-    final data =
-        DateFormat('dd/MM/yyyy HH:mm').format(medicao.data);
+    final data = DateFormat('dd/MM/yyyy HH:mm').format(medicao.data);
 
     final csv = StringBuffer()
       ..writeln('Campo,Valor')
       ..writeln('Nome,${medicao.nome}')
       ..writeln('Data,$data')
-      ..writeln(
-          'Patinagem,${medicao.patinagem.toStringAsFixed(2)}')
-      ..writeln(
-          'Distância,${medicao.distancia.toStringAsFixed(2)}')
+      ..writeln('Patinagem,${medicao.patinagem.toStringAsFixed(2)}')
+      ..writeln('Distância,${medicao.distancia.toStringAsFixed(2)}')
       ..writeln('Voltas,${medicao.voltas}')
-      ..writeln(
-          'Raio do eixo,${medicao.raioEixo.toStringAsFixed(2)}')
-      ..writeln(
-          'Perímetro,${medicao.perimetro.toStringAsFixed(2)}');
+      ..writeln('Perímetro/Circunferência,${medicao.perimetro.toStringAsFixed(2)}');
 
     final dir = await getApplicationDocumentsDirectory();
-    final file = File(
-      '${dir.path}/medicao_${medicao.id}.csv',
-    );
+    final file = File('${dir.path}/calibragem_${medicao.id}.csv');
 
     await file.writeAsString(csv.toString());
 
     await Printing.sharePdf(
       bytes: file.readAsBytesSync(),
-      filename: 'medicao_${medicao.id}.csv',
+      filename: 'calibragem_${medicao.id}.csv',
     );
   }
 }
+
+
+
 
 

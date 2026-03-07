@@ -48,7 +48,7 @@ class _HistoricoPageState extends State<HistoricoPage> {
     setState(_carregarHistorico);
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Medição excluída com sucesso')),
+      const SnackBar(content: Text('Calibragem excluída com sucesso')),
     );
   }
 
@@ -71,28 +71,25 @@ class _HistoricoPageState extends State<HistoricoPage> {
   }
 
   void _aplicarFiltros(List<MedicaoModel> medicoes) {
-    //data
     if (_dataSelecionada != null) {
-      medicoes.removeWhere((m) =>
-          m.data.year != _dataSelecionada!.year ||
-          m.data.month != _dataSelecionada!.month ||
-          m.data.day != _dataSelecionada!.day);
+      medicoes.removeWhere(
+        (m) =>
+            m.data.year != _dataSelecionada!.year ||
+            m.data.month != _dataSelecionada!.month ||
+            m.data.day != _dataSelecionada!.day,
+      );
     }
 
-    //ordem
     switch (_filtroAtual) {
       case FiltroHistorico.maisRecentes:
         medicoes.sort((a, b) => b.data.compareTo(a.data));
         break;
-
       case FiltroHistorico.maisAntigas:
         medicoes.sort((a, b) => a.data.compareTo(b.data));
         break;
-
       case FiltroHistorico.maiorPatinagem:
         medicoes.sort((a, b) => b.patinagem.compareTo(a.patinagem));
         break;
-
       case FiltroHistorico.menorPatinagem:
         medicoes.sort((a, b) => a.patinagem.compareTo(b.patinagem));
         break;
@@ -104,16 +101,14 @@ class _HistoricoPageState extends State<HistoricoPage> {
     return Scaffold(
       backgroundColor: AppColors.fundo,
       appBar: AppBar(
-        title: const Text('Histórico de Medições'),
+        title: const Text('Histórico de Calibragens'),
         backgroundColor: AppColors.azul,
         actions: [
-
           IconButton(
             icon: const Icon(Icons.calendar_today),
             tooltip: 'Filtrar por data',
             onPressed: _selecionarData,
           ),
-
           if (_dataSelecionada != null)
             IconButton(
               icon: const Icon(Icons.clear),
@@ -122,7 +117,6 @@ class _HistoricoPageState extends State<HistoricoPage> {
                 setState(() => _dataSelecionada = null);
               },
             ),
-
           PopupMenuButton<FiltroHistorico>(
             icon: const Icon(Icons.filter_list),
             onSelected: (filtro) {
@@ -166,7 +160,7 @@ class _HistoricoPageState extends State<HistoricoPage> {
           }
 
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('Nenhuma medição encontrada'));
+            return const Center(child: Text('Nenhuma calibragem encontrada'));
           }
 
           final medicoes = List<MedicaoModel>.from(snapshot.data!);
@@ -174,7 +168,7 @@ class _HistoricoPageState extends State<HistoricoPage> {
 
           if (medicoes.isEmpty) {
             return const Center(
-              child: Text('Nenhuma medição encontrada para a data selecionada'),
+              child: Text('Nenhuma calibragem encontrada para a data selecionada'),
             );
           }
 
@@ -183,8 +177,7 @@ class _HistoricoPageState extends State<HistoricoPage> {
             itemCount: medicoes.length,
             itemBuilder: (context, index) {
               final medicao = medicoes[index];
-              final data =
-                  DateFormat('dd/MM/yyyy HH:mm').format(medicao.data);
+              final data = DateFormat('dd/MM/yyyy HH:mm').format(medicao.data);
 
               return Card(
                 margin: const EdgeInsets.only(bottom: 16),
@@ -200,15 +193,17 @@ class _HistoricoPageState extends State<HistoricoPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            medicao.nome,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                          Expanded(
+                            child: Text(
+                              medicao.nome,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                           DeleteButton(
-                            mensagem: 'Deseja excluir esta medição?',
+                            mensagem: 'Deseja excluir esta calibragem?',
                             onConfirm: () => _excluirMedicao(medicao.id),
                           ),
                         ],
@@ -226,12 +221,8 @@ class _HistoricoPageState extends State<HistoricoPage> {
                       ),
                       _linha('Voltas', medicao.voltas.toString()),
                       _linha(
-                        'Perímetro',
+                        'Perímetro / Circunferência',
                         '${medicao.perimetro.toStringAsFixed(2)} m',
-                      ),
-                      _linha(
-                        'Raio do eixo',
-                        '${medicao.raioEixo.toStringAsFixed(2)} m',
                       ),
                       const SizedBox(height: 12),
                       Row(
@@ -293,7 +284,8 @@ class _HistoricoPageState extends State<HistoricoPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(titulo),
+          Expanded(child: Text(titulo)),
+          const SizedBox(width: 12),
           Text(
             valor,
             style: TextStyle(
