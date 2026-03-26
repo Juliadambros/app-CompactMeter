@@ -43,14 +43,14 @@ class _ListaVeiculosPageState extends State<ListaVeiculosPage> {
   }
 
   Future<void> _excluirVeiculo(String veiculoId) async {
-    await VeiculoService().excluirVeiculo(veiculoId);
+    await VeiculoService().moverParaLixeira(veiculoId);
 
     if (!mounted) return;
 
     setState(_carregarVeiculos);
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Máquina excluída com sucesso')),
+      const SnackBar(content: Text('Máquina movida para a lixeira')),
     );
   }
 

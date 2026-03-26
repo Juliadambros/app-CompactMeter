@@ -16,6 +16,8 @@ class CompactacaoModel {
   final double? indiceCompactacao;
   final String statusCalculo;
   final String? observacoes;
+  final bool excluido;
+  final DateTime? dataExclusao;
 
   CompactacaoModel({
     required this.id,
@@ -30,6 +32,8 @@ class CompactacaoModel {
     this.indiceCompactacao,
     required this.statusCalculo,
     this.observacoes,
+    this.excluido = false,
+    this.dataExclusao,
   });
 
   factory CompactacaoModel.criar({
@@ -91,6 +95,12 @@ class CompactacaoModel {
       return DateTime.now();
     }
 
+    DateTime? readNullableDate(String key) {
+      final v = map[key];
+      if (v is Timestamp) return v.toDate();
+      return null;
+    }
+
     return CompactacaoModel(
       id: id,
       usuarioId: readString('usuarioId'),
@@ -99,14 +109,16 @@ class CompactacaoModel {
       nome: readString('nome', fallback: 'Medição de compactação'),
       data: readDate('data'),
       calibragemRealizada: readBool('calibragemRealizada'),
-      medicaoPatinagemId: map['medicaoPatinagemId'],
+      medicaoPatinagemId: map['medicaoPatinagemId']?.toString(),
       patinagemReferencia: readNullableDouble('patinagemReferencia'),
       indiceCompactacao: readNullableDouble('indiceCompactacao'),
       statusCalculo: readString(
         'statusCalculo',
         fallback: 'Aguardando definição da fórmula',
       ),
-      observacoes: map['observacoes'],
+      observacoes: map['observacoes']?.toString(),
+      excluido: readBool('excluido', fallback: false),
+      dataExclusao: readNullableDate('dataExclusao'),
     );
   }
 
@@ -123,6 +135,8 @@ class CompactacaoModel {
       'indiceCompactacao': indiceCompactacao,
       'statusCalculo': statusCalculo,
       'observacoes': observacoes,
+      'excluido': excluido,
+      'dataExclusao': dataExclusao != null ? Timestamp.fromDate(dataExclusao!) : null,
     };
   }
 }

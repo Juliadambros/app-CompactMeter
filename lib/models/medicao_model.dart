@@ -24,6 +24,9 @@ class MedicaoModel {
   final double? altitudeInicial;
   final double? altitudeFinal;
 
+  final bool excluido;
+  final DateTime? dataExclusao;
+
   MedicaoModel({
     required this.id,
     required this.usuarioId,
@@ -42,6 +45,8 @@ class MedicaoModel {
     this.coordenadaFinalY,
     this.altitudeInicial,
     this.altitudeFinal,
+    this.excluido = false,
+    this.dataExclusao,
   });
 
   factory MedicaoModel.criar({
@@ -123,6 +128,20 @@ class MedicaoModel {
       return DateTime.now();
     }
 
+    bool readBool(String key, {bool fallback = false}) {
+  final v = map[key];
+  if (v == null) return fallback;
+  if (v is bool) return v;
+  if (v is String) return v.toLowerCase() == 'true';
+  return fallback;
+}
+
+DateTime? readNullableDate(String key) {
+  final v = map[key];
+  if (v is Timestamp) return v.toDate();
+  return null;
+}
+
     return MedicaoModel(
       id: id,
       usuarioId: readString('usuarioId', fallback: 'DESCONHECIDO'),
@@ -141,6 +160,8 @@ class MedicaoModel {
       coordenadaFinalY: readNullableDouble('coordenadaFinalY'),
       altitudeInicial: readNullableDouble('altitudeInicial'),
       altitudeFinal: readNullableDouble('altitudeFinal'),
+      excluido: readBool('excluido', fallback: false),
+dataExclusao: readNullableDate('dataExclusao'),
     );
   }
 
@@ -162,6 +183,10 @@ class MedicaoModel {
       'coordenadaFinalY': coordenadaFinalY,
       'altitudeInicial': altitudeInicial,
       'altitudeFinal': altitudeFinal,
+      'excluido': excluido,
+'dataExclusao': dataExclusao != null
+    ? Timestamp.fromDate(dataExclusao!)
+    : null,
     };
   }
 

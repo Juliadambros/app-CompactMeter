@@ -43,14 +43,14 @@ class _HistoricoCompactacaoPageState extends State<HistoricoCompactacaoPage> {
   }
 
   Future<void> _excluirCompactacao(String id) async {
-    await CompactacaoService().excluir(id);
+    await CompactacaoService().moverParaLixeira(id);
 
     if (!mounted) return;
 
     setState(_carregarHistorico);
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Medição de compactação excluída com sucesso')),
+      const SnackBar(content: Text('Medição de compactação movida para a lixeira')),
     );
   }
 

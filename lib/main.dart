@@ -7,6 +7,7 @@ import 'firebase_options.dart';
 import 'view/login/login_page.dart';
 import 'view/login/cadastro_page.dart';
 import 'view/admin/home_admin.dart';
+import 'view/admin/lixeira_page.dart';
 import 'view/usuario/home_usuario.dart';
 import 'theme/app_colors.dart';
 
@@ -89,6 +90,7 @@ class MyApp extends StatelessWidget {
         '/login': (_) => const LoginPage(),
         '/cadastro': (_) => const CadastroPage(),
         '/home_admin': (_) => const HomeAdmin(),
+        '/lixeira': (_) => const LixeiraPage(),
         '/home_usuario': (_) => const HomeUsuario(),
       },
     );

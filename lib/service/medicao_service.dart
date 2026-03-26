@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../models/medicao_model.dart';
 
 class MedicaoService {
@@ -16,14 +17,26 @@ class MedicaoService {
   }
 
   Future<List<MedicaoModel>> listarPorUsuario(String usuarioId) async {
-    final query =
-        await _collection.where('usuarioId', isEqualTo: usuarioId).get();
+    final query = await _collection.where('usuarioId', isEqualTo: usuarioId).get();
 
     return query.docs
         .map((doc) => MedicaoModel.fromMap(
               doc.data() as Map<String, dynamic>,
               doc.id,
             ))
+        .where((m) => !m.excluido)
+        .toList();
+  }
+
+  Future<List<MedicaoModel>> listarExcluidas() async {
+    final query = await _collection.get();
+
+    return query.docs
+        .map((doc) => MedicaoModel.fromMap(
+              doc.data() as Map<String, dynamic>,
+              doc.id,
+            ))
+        .where((m) => m.excluido)
         .toList();
   }
 
@@ -38,11 +51,15 @@ class MedicaoService {
               doc.data() as Map<String, dynamic>,
               doc.id,
             ))
+        .where((m) => !m.excluido)
         .toList();
   }
 
-  Future<void> excluirMedicao(String id) async {
-    await _collection.doc(id).delete();
+  Future<void> moverParaLixeira(String id) async {
+    await _collection.doc(id).update({
+      'excluido': true,
+      'dataExclusao': Timestamp.now(),
+    });
   }
 
   Future<List<MedicaoModel>> listarTodas() async {
@@ -59,5 +76,16 @@ class MedicaoService {
     }
 
     return out;
+  }
+
+  Future<void> restaurarMedicao(String id) async {
+    await _collection.doc(id).update({
+      'excluido': false,
+      'dataExclusao': null,
+    });
+  }
+
+  Future<void> excluirPermanentemente(String id) async {
+    await _collection.doc(id).delete();
   }
 }

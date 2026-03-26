@@ -43,16 +43,16 @@ class _HistoricoPatinagemPageState extends State<HistoricoPatinagemPage> {
   }
 
   Future<void> _excluirMedicao(String medicaoId) async {
-    await MedicaoService().excluirMedicao(medicaoId);
+  await MedicaoService().moverParaLixeira(medicaoId);
 
-    if (!mounted) return;
+  if (!mounted) return;
 
-    setState(_carregarHistorico);
+  setState(_carregarHistorico);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Calibragem excluída com sucesso')),
-    );
-  }
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(content: Text('Calibragem movida para a lixeira')),
+  );
+}
 
   Future<void> _selecionarData() async {
     final hoje = DateTime.now();

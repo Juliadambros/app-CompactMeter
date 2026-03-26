@@ -4,6 +4,7 @@ import '../../components/action_card.dart';
 import '../../service/auth_service.dart';
 import '../../theme/app_colors.dart';
 import 'gerenciar_usuarios_page.dart';
+import 'lixeira_page.dart';
 
 class HomeAdmin extends StatelessWidget {
   const HomeAdmin({super.key});
@@ -92,6 +93,18 @@ class HomeAdmin extends StatelessWidget {
                             ),
                           ],
                         ),
+                      ),
+                    );
+                  },
+                ),
+                ActionCard(
+                  icon: Icons.restore_from_trash,
+                  titulo: 'Lixeira',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const LixeiraPage(),
                       ),
                     );
                   },

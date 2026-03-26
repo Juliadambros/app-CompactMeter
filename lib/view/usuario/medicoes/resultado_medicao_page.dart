@@ -239,3 +239,4 @@ class ResultadoMedicaoPage extends StatelessWidget {
     );
   }
 }
+

@@ -181,14 +181,20 @@ class _CalibrarPatinagemPageState extends State<CalibrarPatinagemPage> {
   }
 
   Future<void> _iniciarColeta() async {
-    if (_propriedadeSelecionada == null ||
-        _veiculoSelecionado == null ||
-        _rodaSelecionada == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Selecione propriedade, máquina e roda')),
-      );
-      return;
-    }
+    FocusScope.of(context).unfocus();
+
+  if (!_formKey.currentState!.validate()) {
+    return;
+  }
+
+  if (_propriedadeSelecionada == null ||
+      _veiculoSelecionado == null ||
+      _rodaSelecionada == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Selecione propriedade, máquina e roda')),
+    );
+    return;
+  }
 
     if (!_sensorConectado) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -347,20 +353,27 @@ class _CalibrarPatinagemPageState extends State<CalibrarPatinagemPage> {
   }
 
   Widget _campoNome() {
-    return TextFormField(
-      controller: _nomeCtrl,
-      decoration: const InputDecoration(
-        labelText: 'Nome da calibragem',
-        border: OutlineInputBorder(),
+  return TextFormField(
+    controller: _nomeCtrl,
+    autovalidateMode: AutovalidateMode.onUserInteraction,
+    decoration: const InputDecoration(
+      labelText: 'Nome da calibragem',
+      border: OutlineInputBorder(),
+      errorBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.red),
       ),
-      validator: (v) {
-        if (v == null || v.trim().isEmpty) {
-          return 'Informe o nome da calibragem';
-        }
-        return null;
-      },
-    );
-  }
+      focusedErrorBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.red, width: 2),
+      ),
+    ),
+    validator: (v) {
+      if (v == null || v.trim().isEmpty) {
+        return 'Informe o nome da calibragem';
+      }
+      return null;
+    },
+  );
+}
 
   Widget _campoDistancia() {
     return TextFormField(
@@ -711,7 +724,15 @@ class _CalibrarPatinagemPageState extends State<CalibrarPatinagemPage> {
   }
 
   Future<void> _calcularPatinagem() async {
-    if (!_formKey.currentState!.validate()) return;
+
+  if (_nomeCtrl.text.trim().isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Informe o nome da calibragem')),
+    );
+    return;
+  }
+
+  if (!_formKey.currentState!.validate()) return;
 
     if (_propriedadeSelecionada == null ||
         _veiculoSelecionado == null ||

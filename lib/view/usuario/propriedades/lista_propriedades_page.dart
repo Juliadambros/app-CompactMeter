@@ -46,14 +46,14 @@ class _ListaPropriedadesPageState extends State<ListaPropriedadesPage> {
   }
 
   Future<void> _excluir(String id) async {
-    await PropriedadeService().excluir(id);
+    await PropriedadeService().moverParaLixeira(id);
 
     if (!mounted) return;
 
     setState(() => _carregarPropriedades());
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Propriedade excluída')),
+      const SnackBar(content: Text('Propriedade movida para a lixeira')),
     );
   }
 

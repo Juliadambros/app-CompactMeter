@@ -72,9 +72,7 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
   Future<void> _carregarCaches() async {
     try {
       final props = await propriedadeService.listarPorUsuario(usuario.uid);
-      final veiculos = await veiculoService.listarVeiculosPorUsuario(
-        usuario.uid,
-      );
+      final veiculos = await veiculoService.listarVeiculosPorUsuario(usuario.uid);
 
       if (!mounted) return;
 
@@ -84,47 +82,41 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
       });
     } catch (_) {}
   }
-
+  
   Future<void> _excluirUsuario() async {
     try {
       final medicoes = await medicaoService.listarPorUsuario(usuario.uid);
       for (final m in medicoes) {
-        await medicaoService.excluirMedicao(m.id);
+        await medicaoService.moverParaLixeira(m.id);
       }
 
-      final compactacoes = await compactacaoService.listarPorUsuario(
-        usuario.uid,
-      );
+      final compactacoes = await compactacaoService.listarPorUsuario(usuario.uid);
       for (final c in compactacoes) {
-        await compactacaoService.excluir(c.id);
+        await compactacaoService.moverParaLixeira(c.id);
       }
 
-      final veiculos = await veiculoService.listarVeiculosPorUsuario(
-        usuario.uid,
-      );
+      final veiculos = await veiculoService.listarVeiculosPorUsuario(usuario.uid);
       for (final v in veiculos) {
-        await veiculoService.excluirVeiculo(v.id);
+        await veiculoService.moverParaLixeira(v.id);
       }
 
-      final propriedades = await propriedadeService.listarPorUsuario(
-        usuario.uid,
-      );
+      final propriedades = await propriedadeService.listarPorUsuario(usuario.uid);
       for (final p in propriedades) {
-        await propriedadeService.excluir(p.id);
+        await propriedadeService.moverParaLixeira(p.id);
       }
 
-      await usuarioService.excluirUsuario(usuario.uid);
+      await usuarioService.moverParaLixeira(usuario.uid);
 
       if (!mounted) return;
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Usuário excluído com sucesso')),
+        const SnackBar(content: Text('Usuário movido para a lixeira com sucesso')),
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Erro ao excluir usuário: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao mover usuário para a lixeira: $e')),
+      );
     }
   }
 
@@ -380,9 +372,9 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Erro ao exportar CSV: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao exportar CSV: $e')),
+      );
     }
   }
 
@@ -412,9 +404,9 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Erro ao exportar PDF: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao exportar PDF: $e')),
+      );
     }
   }
 
@@ -436,14 +428,10 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
 
     switch (_ordenacao) {
       case OrdenacaoAdmin.nomeAZ:
-        out.sort(
-          (a, b) => a.nome.toLowerCase().compareTo(b.nome.toLowerCase()),
-        );
+        out.sort((a, b) => a.nome.toLowerCase().compareTo(b.nome.toLowerCase()));
         break;
       case OrdenacaoAdmin.nomeZA:
-        out.sort(
-          (a, b) => b.nome.toLowerCase().compareTo(a.nome.toLowerCase()),
-        );
+        out.sort((a, b) => b.nome.toLowerCase().compareTo(a.nome.toLowerCase()));
         break;
       case OrdenacaoAdmin.dataRecente:
       case OrdenacaoAdmin.dataAntiga:
@@ -469,14 +457,10 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
 
     switch (_ordenacao) {
       case OrdenacaoAdmin.nomeAZ:
-        out.sort(
-          (a, b) => a.nome.toLowerCase().compareTo(b.nome.toLowerCase()),
-        );
+        out.sort((a, b) => a.nome.toLowerCase().compareTo(b.nome.toLowerCase()));
         break;
       case OrdenacaoAdmin.nomeZA:
-        out.sort(
-          (a, b) => b.nome.toLowerCase().compareTo(a.nome.toLowerCase()),
-        );
+        out.sort((a, b) => b.nome.toLowerCase().compareTo(a.nome.toLowerCase()));
         break;
       case OrdenacaoAdmin.dataRecente:
       case OrdenacaoAdmin.dataAntiga:
@@ -512,14 +496,10 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
 
     switch (_ordenacao) {
       case OrdenacaoAdmin.nomeAZ:
-        out.sort(
-          (a, b) => a.nome.toLowerCase().compareTo(b.nome.toLowerCase()),
-        );
+        out.sort((a, b) => a.nome.toLowerCase().compareTo(b.nome.toLowerCase()));
         break;
       case OrdenacaoAdmin.nomeZA:
-        out.sort(
-          (a, b) => b.nome.toLowerCase().compareTo(a.nome.toLowerCase()),
-        );
+        out.sort((a, b) => b.nome.toLowerCase().compareTo(a.nome.toLowerCase()));
         break;
       case OrdenacaoAdmin.dataRecente:
         out.sort((a, b) => b.data.compareTo(a.data));
@@ -560,14 +540,10 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
 
     switch (_ordenacao) {
       case OrdenacaoAdmin.nomeAZ:
-        out.sort(
-          (a, b) => a.nome.toLowerCase().compareTo(b.nome.toLowerCase()),
-        );
+        out.sort((a, b) => a.nome.toLowerCase().compareTo(b.nome.toLowerCase()));
         break;
       case OrdenacaoAdmin.nomeZA:
-        out.sort(
-          (a, b) => b.nome.toLowerCase().compareTo(a.nome.toLowerCase()),
-        );
+        out.sort((a, b) => b.nome.toLowerCase().compareTo(a.nome.toLowerCase()));
         break;
       case OrdenacaoAdmin.dataRecente:
         out.sort((a, b) => b.data.compareTo(a.data));
@@ -638,9 +614,9 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete),
-                          tooltip: 'Excluir',
+                          tooltip: 'Mover para lixeira',
                           onPressed: () async {
-                            await propriedadeService.excluir(p.id);
+                            /*await propriedadeService.moverParaLixeira(p.id);*/
                             if (!mounted) return;
                             await _carregarCaches();
                             setState(() {});
@@ -722,9 +698,9 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
                             ),
                             IconButton(
                               icon: const Icon(Icons.delete),
-                              tooltip: 'Excluir máquina',
+                              tooltip: 'Mover para lixeira',
                               onPressed: () async {
-                                await veiculoService.excluirVeiculo(v.id);
+                               /* await veiculoService.moverParaLixeira(v.id);*/
                                 if (!mounted) return;
                                 await _carregarCaches();
                                 setState(() {});
@@ -814,9 +790,9 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
                             ),
                             IconButton(
                               icon: const Icon(Icons.delete),
-                              tooltip: 'Excluir calibragem',
+                              tooltip: 'Mover calibragem para lixeira',
                               onPressed: () async {
-                                await medicaoService.excluirMedicao(m.id);
+                                await medicaoService.moverParaLixeira(m.id);
                                 if (!mounted) return;
                                 setState(() {});
                               },
@@ -829,10 +805,7 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
                         _infoLinha('Máquina', veicNome),
                         _infoLinha('Roda', rodaNome),
                         const Divider(height: 20),
-                        _infoLinha(
-                          'Distância',
-                          '${m.distancia.toStringAsFixed(2)} m',
-                        ),
+                        _infoLinha('Distância', '${m.distancia.toStringAsFixed(2)} m'),
                         _infoLinha('Voltas', m.voltas.toString()),
                         _infoLinha(
                           'Circunferência da roda',
@@ -844,23 +817,14 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
                         ),
                         _infoLinha(
                           'Coordenada inicial',
-                          _formatCoord(
-                            m.coordenadaInicialY,
-                            m.coordenadaInicialX,
-                          ),
+                          _formatCoord(m.coordenadaInicialY, m.coordenadaInicialX),
                         ),
                         _infoLinha(
                           'Coordenada final',
                           _formatCoord(m.coordenadaFinalY, m.coordenadaFinalX),
                         ),
-                        _infoLinha(
-                          'Altitude inicial',
-                          _formatAlt(m.altitudeInicial),
-                        ),
-                        _infoLinha(
-                          'Altitude final',
-                          _formatAlt(m.altitudeFinal),
-                        ),
+                        _infoLinha('Altitude inicial', _formatAlt(m.altitudeInicial)),
+                        _infoLinha('Altitude final', _formatAlt(m.altitudeFinal)),
                       ],
                     ),
                   ),
@@ -920,9 +884,9 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
                             ),
                             IconButton(
                               icon: const Icon(Icons.delete),
-                              tooltip: 'Excluir medição de compactação',
+                              tooltip: 'Mover medição de compactação para lixeira',
                               onPressed: () async {
-                                await compactacaoService.excluir(c.id);
+                               /* await compactacaoService.moverParaLixeira(c.id);*/
                                 if (!mounted) return;
                                 setState(() {});
                               },
@@ -953,8 +917,7 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
                         _infoLinha('Status', c.statusCalculo),
                         _infoLinha(
                           'Observações',
-                          (c.observacoes == null ||
-                                  c.observacoes!.trim().isEmpty)
+                          (c.observacoes == null || c.observacoes!.trim().isEmpty)
                               ? '—'
                               : c.observacoes!,
                         ),
@@ -1044,9 +1007,9 @@ class _DetalhesUsuarioPageState extends State<DetalhesUsuarioPage> {
           DeleteButton(
             titulo: 'Excluir usuário',
             mensagem:
-                'Este usuário será removido do sistema.\n'
-                'Todas as máquinas, propriedades, calibragens e medições de compactação também serão excluídas.\n\n'
-                'Essa ação não pode ser desfeita.',
+                'Este usuário será movido para a lixeira.\n'
+                'Todas as máquinas, propriedades, calibragens e medições de compactação também irão para a lixeira.\n\n'
+                'Essa ação poderá ser desfeita na lixeira.',
             onConfirm: _excluirUsuario,
           ),
         ],

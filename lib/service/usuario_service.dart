@@ -20,6 +20,15 @@ class UsuarioService {
     final snapshot = await usuarios.get();
     return snapshot.docs
         .map((d) => UsuarioModel.fromMap(d.data() as Map<String, dynamic>))
+        .where((u) => !u.excluido)
+        .toList();
+  }
+
+  Future<List<UsuarioModel>> listarExcluidos() async {
+    final snapshot = await usuarios.get();
+    return snapshot.docs
+        .map((d) => UsuarioModel.fromMap(d.data() as Map<String, dynamic>))
+        .where((u) => u.excluido)
         .toList();
   }
 
@@ -27,11 +36,30 @@ class UsuarioService {
     return usuarios.snapshots().map((snapshot) {
       return snapshot.docs
           .map((d) => UsuarioModel.fromMap(d.data() as Map<String, dynamic>))
+          .where((u) => !u.excluido)
           .toList();
     });
   }
 
+  Future<void> moverParaLixeira(String uid) async {
+    await usuarios.doc(uid).update({
+      'excluido': true,
+      'dataExclusao': Timestamp.now(),
+    });
+  }
+
+  Future<void> restaurarUsuario(String uid) async {
+    await usuarios.doc(uid).update({
+      'excluido': false,
+      'dataExclusao': null,
+    });
+  }
+
   Future<void> excluirUsuario(String uid) async {
+    await moverParaLixeira(uid);
+  }
+
+  Future<void> excluirPermanentemente(String uid) async {
     await usuarios.doc(uid).delete();
   }
 
